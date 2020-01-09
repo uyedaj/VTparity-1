@@ -1,0 +1,202 @@
+species name,Fecundity,Amat,tfec,tamat,POSE,steepness_CR,STATUS,major_group,reproductive_mode,clade,notes
+Anoplopoma fimbria,500000,5.5,13.12236338,0.153846154,Episodic,0.26,NE,teleost,eggs,Anoplopomatidae,sablefish
+Trachurus trachurus,100000,3.5,11.51292546,0.222222222,Episodic,0.75,VU,teleost,livebearing,Carangidae,LH data eyeballed from Fishbase
+Prionace glauca,135,6.5,4.905274778,0.133333333,Survivor,0,NT,elasmobranch,livebearing,Carcharhiniformes,blue shark
+Rhizoprionodon taylori,8,1,2.079441542,0.5,Precocial,0,LC,elasmobranch,livebearing,Carcharhiniformes,sharpnose shark
+Rhizoprionodon terraenovae,7,2.133333333,1.945910149,0.319148936,Survivor,0,LC,elasmobranch,livebearing,Carcharhiniformes,
+Scoliodon laticaudus,14,2,2.63905733,0.333333333,Survivor,0,NT,elasmobranch,livebearing,Carcharhiniformes,
+Scyliorhinus canicula,115,3,4.744932128,0.25,Survivor,0,LC,elasmobranch,livebearing,Carcharhiniformes,catshark
+Sphyrna lewini,31,12.5,3.433987204,0.074074074,Survivor,0,EN,elasmobranch,livebearing,Carcharhiniformes,
+Triaenodon obesus,5,6.5,1.609437912,0.133333333,Survivor,0,NT,elasmobranch,livebearing,Carcharhiniformes,
+Carcharhinus acronotus,5.5,2.333333333,1.704748092,0.3,Survivor,0,NT,elasmobranch,livebearing,Carcharhiniformes,
+Carcharhinus brachyurus,20,12.33333333,2.995732274,0.075,Survivor,0,NT,elasmobranch,livebearing,Carcharhiniformes,
+Carcharhinus falciformis,13,6.5,2.564949357,0.133333333,Survivor,0,NT,elasmobranch,livebearing,Carcharhiniformes,
+Carcharhinus galapagensis,16,6.25,2.772588722,0.137931034,Survivor,0,NT,elasmobranch,livebearing,Carcharhiniformes,
+Carcharhinus leucas,12.5,12.73333333,2.525728644,0.072815534,Survivor,0,NT,elasmobranch,livebearing,Carcharhiniformes,
+Carcharhinus limbatus,8.5,4.333333333,2.140066163,0.1875,Survivor,0,NT,elasmobranch,livebearing,Carcharhiniformes,
+Carcharhinus longimanus,14.5,5,2.674148649,0.166666667,Survivor,0,VU,elasmobranch,livebearing,Carcharhiniformes,
+Carcharhinus obscurus,14,18.2,2.63905733,0.052083333,Survivor,0,VU,elasmobranch,livebearing,Carcharhiniformes,
+Carcharhinus plumbeus,13,14,2.564949357,0.066666667,Survivor,0,VU,elasmobranch,livebearing,Carcharhiniformes,
+Carcharhinus sorrah,7,2,1.945910149,0.333333333,Survivor,0,NT,elasmobranch,livebearing,Carcharhiniformes,
+Carcharhinus tilstoni,6,3,1.791759469,0.25,Survivor,0,LC,elasmobranch,livebearing,Carcharhiniformes,
+Carcharias taurus,2,5,0.693147181,0.166666667,Survivor,0,VU,elasmobranch,livebearing,Carcharhiniformes,
+Carcharodon carcharias,14,10.66666667,2.63905733,0.085714286,Survivor,0,VU,elasmobranch,livebearing,Carcharhiniformes,white shark
+Galeocerdo cuvier,82,5.333333333,4.406719247,0.157894737,Survivor,0,NT,elasmobranch,livebearing,Carcharhiniformes,tiger shark
+Galeorhinus galeus,47.5,9.833333333,3.860729711,0.092307692,Survivor,0,VU,elasmobranch,livebearing,Carcharhiniformes,soupfin
+Mustelus antarcticus,28.33333333,4.5,3.344038968,0.181818182,Survivor,0,LC,elasmobranch,livebearing,Carcharhiniformes,nees updating
+Mustelus asterias,15,2.15,2.708050201,0.317460317,Survivor,0,LC,elasmobranch,livebearing,Carcharhiniformes,
+Mustelus californicus,5,1.3,1.609437912,0.434782609,Precocial,0,LC,elasmobranch,livebearing,Carcharhiniformes,
+Mustelus griseus,16,5.4,2.772588722,0.15625,Survivor,0,DD,elasmobranch,livebearing,Carcharhiniformes,
+Mustelus henlei,5,3.75,1.609437912,0.210526316,Survivor,0,LC,elasmobranch,livebearing,Carcharhiniformes,
+Mustelus mustelus,15,9,2.708050201,0.1,Survivor,0,VU,elasmobranch,livebearing,Carcharhiniformes,
+Isogomphodon oxyrhynchus,8,5.5,2.079441542,0.153846154,Survivor,0,CR,elasmobranch,livebearing,Carcharhiniformes,daggernose
+Engraulis mordax,220000,1,12.30138283,0.5,Opportunistic,0.43,LC,teleost,eggs,Clupeidae,CR based on mean for congeneric Anchovies in Myers' data; California anchovy
+Engraulis encrasicolus,100000,1.5,11.51292546,0.4,Opportunistic,0.47,LC,teleost,eggs,Clupeidae,LH data eyeballed from Fishbase
+Brevoortia patronus,72633.33333,1,11.19317923,0.5,Opportunistic,0.57,LC,teleost,eggs,Clupeidae,
+Sardinops sagax,55000,1,10.91508846,0.5,Opportunistic,0.59,NE,teleost,eggs,Clupeidae,
+Alosa pseudoherengus,300000,2.5,12.61153775,0.285714286,Episodic,0.59,LC,teleost,eggs,Clupeidae,mean Amat from FishBase
+Sprattus sprattus,20000,3,9.903487553,0.25,Episodic,0.65,NE,teleost,eggs,Clupeidae,
+Alosa aestivalis,411733.3333,3,12.92813117,0.25,Episodic,0.71,VU,teleost,eggs,Clupeidae,
+Clupea pallasii pallasii,47471.42857,2,10.76788331,0.333333333,Episodic,0.71,NE,teleost,eggs,Clupeidae,
+Clupea harengus,31000,3,10.34174248,0.25,Episodic,0.74,LC,teleost,eggs,Clupeidae,Fecundity esitmate mean taken from FishBase
+Coilia dussumieri,5000,0.5,8.517193191,0.666666667,Opportunistic,0.81,NE,teleost,eggs,Clupeidae,Goldspotted grenadier anchovy
+Alosa sapidissima,300000,3,12.61153775,0.25,Episodic,0.82,LC,teleost,eggs,Clupeidae,LH data eyeballed from Fishbase
+Brevoortia tyrannus,631000,1,13.35506114,0.5,Opportunistic,0.86,LC,teleost,eggs,Clupeidae,
+Alosa alosa,475000,3,13.07107008,0.25,Episodic,0,LC,teleost,eggs,Clupeidae,
+Alosa fallax,2.00E+05,3,12.20607265,0.25,Episodic,0,LC,teleost,eggs,Clupeidae,
+Alosa immaculata,171554.6667,2,12.05265725,0.333333333,Episodic,0,VU,teleost,eggs,Clupeidae,
+Alosa kessleri,312000,3,12.65075847,0.25,Episodic,0,LC,teleost,eggs,Clupeidae,
+Amblygaster sirm,49949,0.61,10.81875776,0.621118012,Opportunistic,0,NE,teleost,eggs,Clupeidae,baitfish
+Clupeonella cultriventris,20110,2,9.908972483,0.333333333,Episodic,0,LC,teleost,eggs,Clupeidae,black sea sprat
+Dorosoma cepedianum,461451,2,13.04213115,0.333333333,Opportunistic,0,LC,teleost,eggs,Clupeidae,shad; FW & brackish water
+Dorosoma petenense,21003.5,1.5,9.952444369,0.4,Opportunistic,0,LC,teleost,eggs,Clupeidae,"shad; note classed as Opportunisitic, not Episodic, based on uncertainty in Amat and others in its group"
+Gilchristella aestuaria,2000,0.5,7.60090246,0.666666667,Opportunistic,0,LC,teleost,eggs,Clupeidae,
+Herklotsichthys quadrimaculatus,5176,0.4775,8.551787836,0.676818951,Opportunistic,0,NE,teleost,eggs,Clupeidae,notable for short lifespan
+Nematalosa erebi,880000,1,13.68767719,0.5,Opportunistic,0,NE,teleost,eggs,Clupeidae,shad
+Sardinella aurita,72700,0.66,11.19409666,0.602409639,Opportunistic,0,NE,teleost,eggs,Clupeidae,
+Sardinella zunasi,58800,1,10.98189713,0.5,Opportunistic,0,NE,teleost,eggs,Clupeidae,
+Spratelloides delicatulus,897.6666667,0.1925,6.799798804,0.838574423,Opportunistic,0,NE,teleost,eggs,Clupeidae,A_mat data confirmed from primary lit: they mature at 2 months but spawn later in the year
+Spratelloides gracilis,1471.25,0.197,7.293867659,0.835421888,Opportunistic,0,LC,teleost,eggs,Clupeidae,A_mat data confirmed from primary lit: they mature at 2 months but spawn later in the year
+Tenualosa reevesii,4280000,3,15.26946357,0.25,Episodic,0,NE,teleost,eggs,Clupeidae,
+Anchoa mitchilli,45110,0.21,10.71685923,0.826446281,Opportunistic,0.62,LC,teleost,eggs,Engraulidae,CR based on mean for Anchovy in Myers' dataset
+Esox lucius,300000,2,12.61153775,0.333333333,Episodic,0.6,LC,teleost,eggs,Esocidae,LH data eyeballed from Fishbase
+Merluccius productus,200000,3.5,12.20607265,0.222222222,Episodic,0.32,LC,teleost,eggs,Gadidae,LH data eyeballed from Fishbase
+Merluccius bilinearis,300000,3,12.61153775,0.25,Episodic,0.39,NT,teleost,eggs,Gadidae,LH data eyeballed from Fishbase
+Theragra chalcogramma,150000,4,11.91839057,0.2,Episodic,0.55,NE,teleost,eggs,Gadidae,LH data eyeballed from Fishbase
+Micromesistius poutassou,70000,4,11.15625052,0.2,Episodic,0.71,NE,teleost,eggs,Gadidae,LH data eyeballed from Fishbase
+Melanogrammus aeglefinus,700000,4,13.45883561,0.2,Episodic,0.74,VU,teleost,eggs,Gadidae,scant data from Argentine pop
+Pollachius virens,4000000,4,15.20180492,0.2,Episodic,0.81,NE,teleost,eggs,Gadidae,LH data eyeballed from Fishbase
+Merlangius merlangus,300000,2,12.61153775,0.333333333,Episodic,0.81,LC,teleost,eggs,Gadidae,LH data eyeballed from Fishbase
+Merluccius hubbsi,20000,6,9.903487553,0.142857143,Episodic,0.82,NE,teleost,eggs,Gadidae,LH data eyeballed from Fishbase
+Gadus morhua,2000000,4,14.50865774,0.2,Episodic,0.84,VU,teleost,eggs,Gadidae,LH data eyeballed from Fishbase
+Heterodontus portusjacksoni,16,9.5,2.772588722,0.095238095,Survivor,0,LC,elasmobranch,eggs,Heterodontidae,
+Pleurogrammus monopterygius,41000,4.5,10.62132735,0.181818182,Episodic,0.75,NE,teleost,parental_care,Hexagrammidae,greenling
+Hexagrammos decagrammus,953700,3,13.76810444,0.25,Episodic,0,NE,teleost,parental_care,Hexagrammidae,Scorpaenid
+Ophiodon elongatus,5.00E+05,3,13.12236338,0.25,Episodic,0,NE,teleost,parental_care,Hexagrammidae,
+Notorynchus cepedianus,95,11,4.553876892,0.083333333,Survivor,0,DD,elasmobranch,livebearing,Hexanchiformes,Sevengill Shark
+Alopias pelagicus,2,7.5,0.693147181,0.117647059,Survivor,0,VU,elasmobranch,livebearing,Lamniformes,
+Alopias superciliosus,4,7.7,1.386294361,0.114942529,Survivor,0,VU,elasmobranch,livebearing,Lamniformes,
+Alopias vulpinus,4,6,1.386294361,0.142857143,Survivor,0,VU,elasmobranch,livebearing,Lamniformes,
+Cetorhinus maximus,2,10,0.693147181,0.090909091,Survivor,0,VU,elasmobranch,livebearing,Lamniformes,basking
+Isurus oxyrinchus,16,14.25,2.772588722,0.06557377,Survivor,0,VU,elasmobranch,livebearing,Lamniformes,shortfin mako
+Lamna nasus,4.5,9.333333333,1.504077397,0.096774194,Survivor,0,VU,elasmobranch,livebearing,Lamniformes,
+Lophius budegassa,46320,7,10.74332911,0.125,Episodic,0.64,DD,teleost,eggs,Lophiidae,some relatives are NT (Monk)
+Lophius litulon,1540000,4.5,14.24729297,0.181818182,Episodic,0,NE,teleost,eggs,Lophiidae,
+Morone saxitalis,500000,5,13.12236338,0.166666667,Episodic,0.82,LC,teleost,eggs,Perchicthyidae,LH data eyeballed from Fishbase
+Maccullochella peelii,78866.66667,4.134444444,11.27551394,0.194763038,Episodic,0,CR,teleost,eggs,Perchicthyidae,FRESHWATER; INTRODUCED (striped bass relative)
+Sander vitreus,297382.3333,2.963333333,12.60277391,0.252312868,Episodic,0,LC,teleost,eggs,Percidae,Walleye
+Platichthys flesus,1000000,2.5,13.81551056,0.285714286,Episodic,0.57,LC,teleost,eggs,Pleuronectiformes,LH data eyeballed from Fishbase
+Pleuronectes ferrugineus,300000,2,12.61153775,0.333333333,Episodic,0.75,VU,teleost,eggs,Pleuronectiformes,"Synonym for Limanda ferruginea, yellotail flounder.Amat data from NOAA NMFS_NE-140; Fec data from congener"
+Reinhardtius hippoglossoides,80000,9,11.28978191,0.1,Episodic,0.79,NE,teleost,eggs,Pleuronectiformes,LH data eyeballed from Fishbase
+Atheresthes stomias,2340000,5.5,14.66566149,0.153846154,Episodic,0.8,NE,teleost,eggs,Pleuronectiformes,CR based on other flounders in Myers' dataset
+Solea solea,154400,2.75,11.94730192,0.266666667,Episodic,0.84,DD,teleost,eggs,Pleuronectiformes,synonum for solea vulgaris (from Myers' paper)
+Pleuronectes platessa,300000,2.5,12.61153775,0.285714286,Episodic,0.86,LC,teleost,eggs,Pleuronectiformes,LH data eyeballed from Fishbase
+Hippoglossoides elassodon,6.00E+05,1,13.30468493,0.5,Opportunistic,0,NE,teleost,eggs,Pleuronectiformes,
+Hippoglossus hippoglossus,3500000,7.75,15.06827353,0.114285714,Episodic,0,EN,teleost,eggs,Pleuronectiformes,IUCN assessment done in 1996; needs updating
+Liopsetta glacialis,230000,2,12.34583459,0.333333333,Episodic,0,LC,teleost,eggs,Pleuronectiformes,
+Microstomus kitt,355148,3,12.78028988,0.25,Episodic,0,NE,teleost,eggs,Pleuronectiformes,
+Paralichthys olivaceus,36300000,3,17.4073283,0.25,Episodic,0,NE,teleost,eggs,Pleuronectiformes,flounder
+Parophrys vetulus,1900000,4,14.45736444,0.2,Episodic,0,NE,teleost,eggs,Pleuronectiformes,
+Psettodes erumei,1316735,3.5,14.09066575,0.222222222,Episodic,0,NE,teleost,eggs,Pleuronectiformes,
+Scophthalmus maximus,1.50E+07,3,16.52356076,0.25,Episodic,0,NE,teleost,eggs,Pleuronectiformes,
+Leucoraja erinacea,32.5,3,3.481240089,0.25,Survivor,0,NT,elasmobranch,livebearing,Myliobatiformes,
+Manta alfredi,1,5,0,0.166666667,Survivor,0,VU,elasmobranch,eggs,Rajiformes,changed Amat from 3 to 5 based on more conservative estimates in Dulvy et al. 2014
+Potamotrygon leopoldi,2,3,0.693147181,0.25,Survivor,0,DD,elasmobranch,eggs,Rajiformes,
+Raja eglanteria,44,3,3.784189634,0.25,Survivor,0,LC,elasmobranch,eggs,Rajiformes,clearnose skate
+Torpedo californica,20,8,2.995732274,0.111111111,Survivor,0,LC,elasmobranch,eggs,Rajiformes,
+Oncorhynchus gorbuscha,6000,2,8.699514748,0.333333333,Episodic,0.46,NE,teleost,parental_care,Salmonidae,
+Oncorhynchus keta,3100,2,8.03915739,0.333333333,Episodic,0.48,NE,teleost,parental_care,Salmonidae,
+Salmo salar,4000,2,8.29404964,0.333333333,Episodic,0.54,NE,teleost,parental_care,Salmonidae,LH data eyeballed from Fishbase
+Oncorhynchus nerka,10000,4,9.210340372,0.2,Episodic,0.55,LC,teleost,parental_care,Salmonidae,
+Oncorhynchus kisutch,5069,2,8.530898838,0.333333333,Episodic,0.65,NE,teleost,parental_care,Salmonidae,
+Oncorhynchus tshawytscha,9353.166667,2,9.143470246,0.333333333,Episodic,0.65,NE,teleost,parental_care,Salmonidae,
+Salvelinus namaycush,10000,8,9.210340372,0.111111111,Episodic,0.86,NE,teleost,parental_care,Salmonidae,lake trout
+Salvelinus fontinalis,2500,2.5,7.824046011,0.285714286,Episodic,0.87,NE,teleost,parental_care,Salmonidae,LH data eyeballed from Fishbase
+Brachymystax lenok,5000,3.333333333,8.517193191,0.230769231,Episodic,0,NE,teleost,eggs,Salmonidae,
+Coregonus autumnalis,62666.66667,5.25,11.04558495,0.16,Episodic,0,LC,teleost,eggs,Salmonidae,
+Coregonus maraena,50000,2,10.81977828,0.333333333,Episodic,0,VU,teleost,eggs,Salmonidae,
+Coregonus nasus,140000,5.625,11.8493977,0.150943396,Episodic,0,LC,teleost,eggs,Salmonidae,
+Coregonus oxyrinchus,50000,2.5,10.81977828,0.285714286,Episodic,0,EX,teleost,eggs,Salmonidae,Has not been seen since 1940!! Brackish
+Coregonus peled,105000,3.75,11.56171563,0.210526316,Episodic,0,LC,teleost,eggs,Salmonidae,
+Coregonus pidschian,50000,3.833333333,10.81977828,0.206896552,Episodic,0,LC,teleost,eggs,Salmonidae,
+Coregonus sardinella,58550,2.333333333,10.97763637,0.3,Episodic,0,LC,teleost,eggs,Salmonidae,
+Coregonus ussuriensis,33300,5,10.41331268,0.166666667,Episodic,0,NE,teleost,eggs,Salmonidae,
+Hucho hucho,14500,3.5,9.581903928,0.222222222,Episodic,0,EN,teleost,eggs,Salmonidae,native only in Danube drainage
+Hucho taimen,44000,4.8,10.69194491,0.172413793,Episodic,0,VU,teleost,eggs,Salmonidae,Asian drainages; freshwater only
+Oncorhynchus clarkii,3793,2.8,8.240912542,0.263157895,Episodic,0,NE,teleost,parental_care,Salmonidae,
+Oncorhynchus masou masou,2925,3,7.98104976,0.25,Episodic,0,NE,teleost,parental_care,Salmonidae,
+Prosopium coulterii,1141.666667,1.5,7.040244462,0.4,Opportunistic,0,NE,teleost,eggs,Salmonidae,small whitefish
+Prosopium cylindraceum,11944,5.5,9.387984339,0.153846154,Episodic,0,NE,teleost,eggs,Salmonidae,whitefish
+Salvelinus leucomaenis imbrius,3515,3,8.164794804,0.25,Episodic,0,NE,teleost,eggs,Salmonidae,
+Stenodus leucichthys,391250,7.7,12.87710202,0.114942529,Episodic,0,EW,teleost,eggs,Salmonidae,extinct in the wild; survives through stocking
+Stenodus nelma,420000,5.666666667,12.94800999,0.15,Episodic,0,LC,teleost,eggs,Salmonidae,
+Scomber japonicus,873841.25,2,13.680654,0.333333333,Episodic,0.38,LC,teleost,eggs,Scombridae,mackerel
+Thunnus maccoyii,10000000,8,16.11809565,0.111111111,Episodic,0.42,CR,teleost,eggs,Scombridae,LH data eyeballed from Fishbase
+Thunnus thunnus,1000000,5,13.81551056,0.166666667,Episodic,0.56,EN,teleost,eggs,Scombridae,trait data from IUCN red list assessment
+Thunnus obesus,8332658.5,3,15.93569311,0.25,Episodic,0.57,VU,teleost,eggs,Scombridae,
+Thunnus albacares,12803333.33,2.875,16.36521611,0.258064516,Episodic,0.7,NT,teleost,eggs,Scombridae,
+Scomber scombrus,300000,2,12.61153775,0.333333333,Episodic,0.81,LC,teleost,eggs,Scombridae,LH data eyeballed from Fishbase
+Pagrus auratus,250000,3.5,12.4292162,0.222222222,Episodic,0.94,LC,teleost,eggs,Scombridae,LH data from West Aus. Rec Fishing fact sheet pink snapper 
+Acanthocybium solandri,6.00E+06,1,15.60727003,0.5,Opportunistic,0,LC,teleost,eggs,Scombridae,Wahoo
+Euthynnus affinis,680000,3,13.42984808,0.25,Episodic,0,LC,teleost,eggs,Scombridae,
+Scomberomorus cavalla,5500590.167,2,15.52036595,0.333333333,Episodic,0,LC,teleost,eggs,Scombridae,mackerel
+Scomberomorus commerson,1133333.333,1.8,13.9406737,0.357142857,Opportunistic,0,NT,teleost,eggs,Scombridae,spanish mackerel
+Scomberomorus lineolatus,2143000,2,14.57771727,0.333333333,Episodic,0,LC,teleost,eggs,Scombridae,
+Thunnus alalunga,3.00E+06,4.666666667,14.91412285,0.176470588,Episodic,0,NT,teleost,eggs,Scombridae,
+Thunnus orientalis,1.00E+07,3,16.11809565,0.25,Episodic,0,VU,teleost,eggs,Scombridae,
+Thymallus arcticus,12946,3,9.468542139,0.25,Episodic,0,NE,teleost,eggs,Scombridae,
+Sebastes goodei,666000,2.5,13.40904495,0.285714286,Episodic,0.35,NE,teleost,livebearing,Sebastidae,
+Sebastes alutus,266000,8.14,12.49125159,0.10940919,Episodic,0.43,NE,teleost,livebearing,Sebastidae,
+Sebastes mentella,67540,11,11.12047529,0.083333333,Episodic,0.47,LC,teleost,livebearing,Sebastidae,
+Helicolenus dactylopterus,428343,15,12.96767956,0.0625,Episodic,0,LC,teleost,livebearing,Sebastidae,
+Sebastes auriculatus,678000,3,13.42690257,0.25,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes caurinus,640000,4,13.36922346,0.2,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes chlorostictus,1077500,4.5,13.8901541,0.181818182,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes chrysomelas,425000,3,12.95984445,0.25,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes constellatus,501000,5.5,13.12436138,0.153846154,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes crameri,549532,3,13.21682229,0.25,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes diploproa,255000,6.5,12.44901882,0.133333333,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes elongatus,344000,5,12.74839694,0.166666667,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes entomelas,671316,3.333333333,13.41699524,0.230769231,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes flavidus,1569500,6.333333333,14.26626766,0.136363636,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes hopkinsi,37000,4.5,10.51867319,0.181818182,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes jordani,62500,1.5,11.04292184,0.4,Opportunistic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes levis,2395500,9.5,14.68910254,0.095238095,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes melanops,1167728.5,6.75,13.97057097,0.129032258,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes melanostomus,769000,6.5,13.55284625,0.133333333,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes miniatus,4100500,4.5,15.22661948,0.181818182,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes mystinus,524000,3.5,13.16924696,0.222222222,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes norvegicus,232947,10,12.35856624,0.090909091,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes paucispinis,2632000,3,14.78325457,0.25,Episodic,0,CR,teleost,livebearing,Sebastidae,NEEDS UPDATING
+Sebastes pinniger,1144500,4.333333333,13.95047842,0.1875,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes rosaceus,224500,4,12.32163099,0.2,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes ruberrimus,2700000,8,14.80876233,0.111111111,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes rufus,545000,2,13.20854107,0.333333333,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes saxicola,248333.3333,3.666666667,12.42252721,0.214285714,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes serranoides,774000,4,13.55932715,0.2,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Sebastes taczanowskii,111000,3,11.61728548,0.25,Episodic,0,NE,teleost,livebearing,Sebastidae,
+Argyrops spinifer,1240000,2,14.03062194,0.333333333,Episodic,0.95,LC,teleost,eggs,Sparidae,
+Stenotomus chrysops,11860,2,9.380926673,0.333333333,Episodic,0.95,NT,teleost,eggs,Sparidae,
+Acanthopagrus australis,3.00E+06,3.666666667,14.91412285,0.214285714,Episodic,0,LC,teleost,eggs,Sparidae,
+Acanthopagrus butcheri,3.00E+06,2.8,14.91412285,0.263157895,Episodic,0,LC,teleost,eggs,Sparidae,
+Pagellus acarne,536000,1.5,13.19188944,0.4,Opportunistic,0,LC,teleost,eggs,Sparidae,
+Pagellus bellottii,406800,1,12.91607694,0.5,Opportunistic,0,LC,teleost,eggs,Sparidae,
+Pagellus bogaraveo,5.00E+05,4,13.12236338,0.2,Episodic,0,NT,teleost,eggs,Sparidae,
+Pagellus erythrinus,256600,1.75,12.45527373,0.363636364,Opportunistic,0,LC,teleost,eggs,Sparidae,
+Centroscymnus crepidater,8,9,2.079441542,0.1,Survivor,0,LC,elasmobranch,livebearing,Squaliformes,velvet dogfish
+Hippocampus barbouri,250,0.33,5.521460918,0.751879699,Precocial,0,VU,teleost,parental_care,Syngnathidae,
+Hippocampus capensis,107.5,0.5,4.677490848,0.666666667,Precocial,0,EN,teleost,parental_care,Syngnathidae,
+Hippocampus comes,350,0.5,5.857933154,0.666666667,Precocial,0,EN,teleost,parental_care,Syngnathidae,
+Hippocampus erectus,1552,0.5,7.347299701,0.666666667,Precocial,0,VU,teleost,parental_care,Syngnathidae,
+Hippocampus fuscus,150,0.33,5.010635294,0.751879699,Precocial,0,DD,teleost,parental_care,Syngnathidae,
+Hippocampus hippocampus,865,0.33,6.762729507,0.751879699,Precocial,0,DD,teleost,parental_care,Syngnathidae,
+Hippocampus ingens,2000,0.33,7.60090246,0.751879699,Precocial,0,VU,teleost,parental_care,Syngnathidae,
+Hippocampus kuda,1202.5,0.54,7.092158002,0.649350649,Precocial,0,VU,teleost,parental_care,Syngnathidae,
+Hippocampus spinosissimus,683,0.5,6.52649486,0.666666667,Precocial,0,VU,teleost,parental_care,Syngnathidae,
+Hippocampus trimaculatus,1391.5,0.5,7.238137581,0.666666667,Precocial,0,VU,teleost,parental_care,Syngnathidae,
+Hippocampus whitei,250,0.52,5.521460918,0.657894737,Precocial,0,DD,teleost,parental_care,Syngnathidae,
+Syngnathus abaster,60,1,4.094344562,0.5,Precocial,0,LC,teleost,parental_care,Syngnathidae,
+Syngnathus typhle,250,1,5.521460918,0.5,Precocial,0,LC,teleost,parental_care,Syngnathidae,
+Xiphias gladius,1.70E+07,5,16.6487239,0.166666667,Episodic,0.88,LC,teleost,parental_care,Xiphidae,
+Squatina squatina,13.824,13,2.626406212,0.071428571,Survivor,0,CR,elasmobranch,livebearing,Squatiniformes,
+Epinephelus fuscoguttatus,1940598,5.5,14.47850673,0.153846154,Episodic,0,NT,teleost,eggs,Epinephelinae,
