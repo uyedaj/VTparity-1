@@ -57,7 +57,12 @@ scale_colour_Publication <- function(...){
 dat = x %>%
   filter(order != "Gymnophiona") %>%
   filter(order != "Rhynchocephalia") %>%
+  mutate(repmode = recode(repmode, 
+                        `Dir`="1",
+                        `Viv`="1",
+                        `Lar`="0")) %>%
   droplevels()
+
 
 # scatter plot, color by order (color by clas also looks good), densities plotted on edges
 ggscatterhist(dat, x = "juvMort", y = "adMort",
@@ -68,11 +73,18 @@ ggscatterhist(dat, x = "juvMort", y = "adMort",
 
 # same as above, but size of points related to body size (!!! not all records have size, so may omit points)
 ggscatterhist(dat, x = "juvMort", y = "adMort",
-              color = "order", size = log(dat$svl)/5, 
+              color = "order", size = log(dat$svl)/3, 
               palette = "jco",xlab = "Juvenile Mortality", ylab = "Adult Mortality", 
-              margin.params = list(fill = "class", color = "black", size = 0.2), ellipse = F
+              margin.params = list(fill = "order", color = "black", size = 0.2), ellipse = F
 ) 
 
+
+# same as above, but color by repmode
+ggscatterhist(dat, x = "juvMort", y = "adMort",
+              color = "repmode", shape = "class", 
+              palette = "jco",xlab = "Juvenile Mortality", ylab = "Adult Mortality", 
+              margin.params = list(fill = "repmode", color = "black", size = 0.2), ellipse = F
+) 
 
 # visualizing the ecto endo split by how taxa partition juvenile mortality
 # fill by order alos interesting
