@@ -30,7 +30,7 @@ dat$juvSurv = ifelse((dat$Longevity_max_y - dat$AaM) < 1,
                      1/((dat$Longevity_max_y - dat$AaM) * (dat$Litter_size_mean * dat$Reproductive_output_y)))
 
 dat$juvMort = 1-log(dat$juvSurv)
-dat$adMort = 1-dat$log.AaM
+dat$adMort = 1/(1 + dat$AaM)
 
 
 dat$Order = as.factor(dat$Order)
@@ -61,7 +61,7 @@ dat = dat %>%
 # extract useful columns
 amphs = dat %>%
   mutate(Class = rep("Amphibia", length.out = length(Order))) %>%
-  select(class = "Class", order = "Order", family = "Family", AaM = "AaM", log.AaM = "log.AaM", longevity = "Longevity_max_y", "juvSurv", "juvMort", "adMort", mass = "Body_mass_g", svl = "Body_size_mm", birth.svl = "Offspring_size_mean")
+  select(class = "Class", order = "Order", family = "Family", AaM = "AaM", log.AaM = "log.AaM", longevity = "Longevity_max_y", "juvSurv", "juvMort", "adMort", mass = "Body_mass_g", svl = "Body_size_mm", birth.svl = "Offspring_size_mean", repmode = "RepMode")
 
 rm(dat)
 rm(spp)
@@ -76,15 +76,16 @@ dat = as.data.frame(dat)
 dat = dat %>%
   filter(Class == "Amphibia")
 
+dat$repmode = as.factor(dat$repmode)
 dat$log.AaM = log(dat$AaM)
 dat$juvSurv = ifelse((dat$Longevity - dat$AaM) < 1, 
                      1/(dat$Clutches.per.year * dat$Clutch),
                      1/((dat$Longevity - dat$AaM) * (dat$Clutches.per.year * dat$Clutch)))
 
 dat$juvMort = 1-log(dat$juvSurv)
-dat$adMort = 1-dat$log.AaM
+dat$adMort = 1/(1 + dat$AaM)
 amps = dat %>%
-  select(class = "Class", order = "Order", family = "Family", "AaM", log.AaM = "log.AaM", longevity = "Longevity", "juvSurv", "juvMort", "adMort", svl = "Max.Size")
+  select(class = "Class", order = "Order", family = "Family", "AaM", log.AaM = "log.AaM", longevity = "Longevity", "juvSurv", "juvMort", "adMort", svl = "Max.Size", repmode = "repmode")
 
 rm(dat)
 
@@ -98,6 +99,7 @@ dat = as.data.frame(dat)
 dat = dat %>%
   filter(Class == "Reptilia")
 
+dat$repmode = as.factor(dat$repmode)
 dat$log.AaM = log(dat$AaM)
 
 dat$juvSurv = ifelse((dat$Longevity - dat$AaM) < 1, 
@@ -105,10 +107,10 @@ dat$juvSurv = ifelse((dat$Longevity - dat$AaM) < 1,
                      1/((dat$Longevity - dat$AaM) * (dat$Clutches.per.year * dat$Clutch)))
 
 dat$juvMort = 1-log(dat$juvSurv)
-dat$adMort = 1-dat$log.AaM
+dat$adMort = 1/(1 + dat$AaM)
 
 reps = dat %>%
-  select(class = "Class", order = "Order", family = "Family", "AaM", log.AaM = "log.AaM", longevity = "Longevity", "juvSurv", "juvMort", "adMort", svl = "Max.Size")
+  select(class = "Class", order = "Order", family = "Family", "AaM", log.AaM = "log.AaM", longevity = "Longevity", "juvSurv", "juvMort", "adMort", svl = "Max.Size", repmode = "repmode")
 
 rm(dat)
 
@@ -133,12 +135,12 @@ dat[is.na(dat[,26]),26] = dat[is.na(dat[,26]),27]
 # caculate age at maturity (in years)
 dat$AaM = (dat$oldest.age.at.first.breeding..months. + dat$youngest.age.at.first.breeding..months.) / 24
 dat$log.AaM = log(dat$AaM)
-dat$adMort = 1-dat$log.AaM
+dat$adMort = 1/(1 + dat$AaM)
 
 dat$Order = as.factor(dat$Order)
 
 liz = dat %>%
-  select(class = "Class", order = "Order", family = "Family", "AaM", "log.AaM", "adMort", svl = "female.SVL", birth.svl = "hatchling.neonate.SVL")
+  select(class = "Class", order = "Order", family = "Family", "AaM", "log.AaM", "adMort", svl = "female.SVL", birth.svl = "hatchling.neonate.SVL", repmode = "reproductive.mode")
 
 rm(dat)
 
@@ -163,11 +165,13 @@ dat$juvSurv = ifelse((dat$longevity - dat$AaM) < 1,
 
 
 dat$juvMort = 1-log(dat$juvSurv)
-dat$adMort = 1-dat$log.AaM
+dat$adMort = 1/(1 + dat$AaM)
+
+dat$repmode = as.factor(as.numeric(as.factor(dat$class))-1)
 
 endos = dat %>% 
   mutate(order = class) %>%
-  select("order", "class", "family", "AaM", "log.AaM", "longevity", "juvSurv", "juvMort", "adMort", svl = "adult_svl_cm", birth.svl = "birth_or_hatching_svl_cm", mass = "adult_body_mass_g", birth.mass = "birth_or_hatching_weight_g") %>%
+  select("order", "class", "family", "AaM", "log.AaM", "longevity", "juvSurv", "juvMort", "adMort", svl = "adult_svl_cm", birth.svl = "birth_or_hatching_svl_cm", mass = "adult_body_mass_g", birth.mass = "birth_or_hatching_weight_g", repmode = "repmode") %>%
   mutate(svl = svl * 10) %>%
   mutate(birth.svl = birth.svl * 10) # convert to mm for consistency
 
