@@ -8,8 +8,7 @@ library(ggpubr)
 library(RColorBrewer)
 library(dplyr)
 library(cowplot) 
-
-setwd("C:/Users/George/Documents/Holly")
+library(ggforce)
 
 # gg plot themes to make neat figures
 theme_Publication <- function(base_size=14, base_family="helvetica") {
@@ -53,6 +52,251 @@ scale_colour_Publication <- function(...){
   
 }
 
+
+
+dat = x %>%
+  filter(order != "Rhynchocephalia")%>%
+  filter(order != "Gymnophiona") %>%
+  filter(class != "Aves") %>%
+  filter(class != "Mammalia")
+
+
+ggplot(dat, aes(order, log(svl))) +
+  geom_sina() +
+  xlab("") + ylab("Body Size") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())
+
+ggplot(dat, aes(order, log(birth.svl), col = order)) +
+  geom_sina() +
+  xlab("") + ylab("Offspring Size") +
+  theme_Publication() + theme(
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+ggplot(dat, aes(order, log(reloff), col = order, size = svl)) +
+  geom_sina() +
+  xlab("") + ylab("Offspring:Adult Size") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")+ 
+  scale_size(guide = 'none')
+
+ggplot(dat, aes(order, log(RCM), col = order, size = svl)) +
+  geom_sina() +
+  xlab("") + ylab("Relative Clutch Mass") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")+ 
+  scale_size(guide = 'none')
+
+ggplot(dat, aes(order, log(IPB), col = order, size = svl)) +
+  geom_sina() +
+  xlab("") + ylab("Relative Investment Per Clutch") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")+ 
+  scale_size(guide = 'none')
+
+ggplot(dat, aes(order, juvMort, col = repmode)) +
+  geom_sina() +
+  xlab("") + ylab("Juvenile Mortality") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+ggplot(dat, aes(order, adMort, col = repmode)) +
+  geom_sina() +
+  xlab("") + ylab("Adult Mortality") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+ggplot(dat, aes(order, log(juvMort/adMort), size = sqrt(svl))) +
+  geom_sina() +
+  xlab("") + ylab("Juvenile mortality relative to adult mortality") +
+  theme_Publication() + theme(
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+ggplot(dat, aes(order, juvMort, size = log(svl))) +
+  geom_sina() +
+  xlab("") + ylab("Juvenile Mortality") +
+  theme_Publication() + theme(
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+
+ggplot(dat, aes(log(reloff), log(juvMort/adMort), color = class)) +
+  geom_point() +
+  geom_smooth(method = "glm") +
+  xlab("Relative Offspring Size") + ylab("Relative Offspring Mortality") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+
+
+dat$order = factor(dat$order, levels = c("Fish", "Sharks", "Anura", "Caudata", "Crocodilia", "Testudines", "Squamata", "Aves", "Mammalia"))
+
+
+ggplot(dat, aes(log(AaM), log(longevity), color = class)) +
+  geom_point() +
+  geom_smooth(method = "glm") +
+  xlab("Age at Maturity") + ylab("Longevity") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+ggplot(dat, aes(log(AaM), juvMort, color = class)) +
+  geom_point() +
+  geom_smooth(method = "glm") +
+  xlab("Age at Maturity") + ylab("Juvenile Mortality") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+ggplot(dat, aes(adMort, juvMort, color = class)) +
+  geom_point() +
+  xlab("Adult Mortality") + ylab("Juvenile Mortality") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+ggplot(subset(dat, !is.na(repmode)), aes(order, juvMort, col = repmode)) +
+  geom_boxplot(lwd=1.5) +
+  xlab("") + ylab("Juvenile Mortality") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank()) + 
+  scale_color_brewer(palette = "Dark2")
+
+ggplot(dat, aes(order, log(svl), col = repmode)) +
+  geom_sina() +
+  xlab("") + ylab("Body Size") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+
+ggplot(subset(dat, !is.na(repmode)), aes(order, log(reloff), col = repmode)) +
+  geom_boxplot(lwd=1.5) +
+  xlab("") + ylab("Offspring:Adult Size") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+ggplot(subset(dat, !is.na(repmode)), aes(order, log(svl-birth.svl), col = order, size = svl)) +
+  geom_sina() +
+  xlab("") + ylab("Lifetime Growth") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_size(guide = 'none')
+
+
+ggplot(subset(dat, !is.na(repmode)), aes(order, log(birth.svl), col = repmode)) +
+  geom_boxplot(lwd=1.5) +
+  xlab("") + ylab("Offspring Size") +
+  theme_Publication() + theme(
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2") 
+
+ggplot(subset(dat, !is.na(repmode)), aes(order, log(svl), col = repmode)) +
+  geom_boxplot(lwd=1.5) +
+  xlab("") + ylab("Adult Size") +
+  theme_Publication() + theme(
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")+
+  ylim(c(0,11))
+
+ggplot(subset(dat, !is.na(repmode)), aes(order, log(svl-birth.svl), col = repmode)) +
+  geom_boxplot(lwd=1.5) +
+  xlab("") + ylab("Lifetime Growth") +
+  theme_Publication() + theme(
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+ggplot(subset(dat, !is.na(repmode)), aes(order, log(svl-birth.svl), col = repmode, size = svl)) +
+  geom_sina() +
+  xlab("") + ylab("Lifetime Growth") +
+  theme_Publication() + theme(    
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+dat$adMortScal = scale(dat$adMort)
+dat$juvMortScal = scale(dat$juvMort)
+dat$totMort = dat$adMortScal + dat$juvMortScal
+
+ggplot(subset(dat, !is.na(repmode)), aes(order, totMort, col = order, size = svl)) +
+  geom_sina() +
+  xlab("") + ylab("Lifetime Mortality") +
+  theme_Publication() + theme(    
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2") +
+  scale_size(guide = 'none')
+
+ggplot(subset(dat, !is.na(repmode)), aes(order, juvMort, col = repmode, size = svl)) +
+  geom_sina() +
+  xlab("") + ylab("Lifetime Reproductive Output") +
+  theme_Publication() + theme(    
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+ggplot(subset(dat, !is.na(repmode)), aes(order, adMort, col = repmode, size = svl)) +
+  geom_sina() +
+  xlab("") + ylab("Adult Mortality") +
+  theme_Publication() + theme(    
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+
+dat2 = x %>%
+  filter(class == "Amphibia" | order == "Squamata")%>% 
+  mutate(repmode = recode(repmode, 
+                          `1`="Viviparity / DD",
+                          `0`="Oviparity / L")) %>%
+  droplevels()
+
+
+ggplot(subset(dat2, !is.na(repmode)), aes(class, juvMort, col = repmode)) +
+  geom_boxplot(width=1.5,lwd=1.5, varwidth = T) +
+  xlab("") + ylab("Juvenile Mortality") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank()) + 
+  scale_color_brewer(palette = "Dark2")
+
+ggplot(subset(x, !is.na(repmode)), aes(order, log(reloff), col = repmode)) +
+  geom_boxplot(width=1.5,lwd=1.5, varwidth = T) +
+  xlab("") + ylab("Offspring:Adult Size") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+
 # filter out depauperate clades that will mess up density plots
 dat = x %>%
   filter(order != "Gymnophiona") %>%
@@ -63,12 +307,19 @@ dat = x %>%
                         `Lar`="0")) %>%
   droplevels()
 
+which(dat$repmode == "NA")
 
 # scatter plot, color by order (color by clas also looks good), densities plotted on edges
 ggscatterhist(dat, x = "juvMort", y = "adMort",
-              color = "order",
+              color = "repmode",
               palette = "Dark2",xlab = "Juvenile Mortality", ylab = "Adult Mortality", 
-              margin.params = list(fill = "order", color = "black", size = 0.2), ellipse = F
+              margin.params = list(fill = "repmode", color = "black", size = 0.2), ellipse = F
+) 
+
+ggscatterhist(dat, x = "juvMort", y = "adMort",
+              color = "class",
+              palette = "Dark2",xlab = "Juvenile Mortality", ylab = "Adult Mortality", 
+              margin.params = list(fill = "class", color = "black", size = 0.2), ellipse = F
 ) 
 
 # same as above, but size of points related to body size (!!! not all records have size, so may omit points)
@@ -82,7 +333,7 @@ ggscatterhist(dat, x = "juvMort", y = "adMort",
 # same as above, but color by repmode
 ggscatterhist(dat, x = "juvMort", y = "adMort",
               color = "repmode", shape = "class", 
-              palette = "jco",xlab = "Juvenile Mortality", ylab = "Adult Mortality", 
+              palette = "Dark2",xlab = "Juvenile Mortality", ylab = "Adult Mortality", 
               margin.params = list(fill = "repmode", color = "black", size = 0.2), ellipse = F
 ) 
 
@@ -139,4 +390,112 @@ ggplot(dat, aes(x = jitter(adMort), y = log(svl), colour = class)) +
     axis.ticks = element_blank())+ 
   scale_color_brewer(palette="Paired")
 
+ggplot(dat, aes(x = log(svl), y = log(birth.svl), colour = repmode, shape = class)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  xlab("Max Size") + ylab("Offspring Size") +
+  theme_Publication() + theme(
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette="Dark2")
 
+ggplot(dat, aes(x = log(svl), y = log(birth.svl), shape = class, colour = repmode)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  xlab("Maximum Size") + ylab("Offspring Size") +
+  theme_Publication() + theme(
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette="Dark2")
+
+dat2 = x %>%
+  filter(class == "Amphibia" | order == "Squamata")
+
+ggplot(dat, aes(x = juvMort, y = log(birth.svl), colour = repmode, size = svl)) +
+  geom_point() +
+  xlab("Juvenile Mortality") + ylab("Offspring Size") +
+  theme_Publication() + theme(
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette="Dark2") +
+  scale_shape(guide = 'none') +
+  scale_size(guide = 'none') +
+  facet_grid(~class)
+
+
+ggplot(dat, aes(x = log(dat$Litter_size_mean), y = log(dat$Offspring_size_mean), colour = RepMode, shape = Order, size = dat$Offspring_size_mean)) +
+  geom_point() +
+  xlab("Litter Size") + ylab("Offspring Size") +
+  theme_Publication() + theme(
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette="Dark2") +
+  scale_shape(guide = 'none') +
+  scale_size(guide = 'none') 
+  
+
+dat$class = factor(dat$class, levels = c("Osteichthyes", "Amphibia", "Reptilia", "Aves", "Mammalia"))
+comps = list(c("Osteichthyes", "Amphibia"), 
+             c("Amphibia", "Reptilia"), 
+             c("Reptilia", "Aves"), 
+             c("Aves", "Mammalia"),
+             c("Osteichthyes", "Reptilia"),
+             c("Osteichthyes", "Aves"),
+             c("Osteichthyes", "Mammalia"),
+             c("Amphibia", "Aves"),
+             c("Amphibia", "Mammalia"),
+             c("Reptilia", "Mammalia"))
+
+ggplot(subset(dat, !is.na(repmode)), aes(class, juvMort, col = repmode)) +
+  geom_boxplot(lwd = 1.5)+
+  ylab("Juvenile Mortality") + xlab("Order") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank()) + 
+  scale_color_brewer(palette = "Dark2")
+
+ggplot(subset(dat, !is.na(repmode)), aes(class, adMort, col = repmode)) +
+  geom_boxplot(lwd = 1.5)+
+  ylab("Adult Mortality") + xlab("Order") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+ggplot(subset(dat, !is.na(repmode)), aes(class, log(svl), col = repmode)) +
+  geom_boxplot(lwd = 1.5)+
+  ylab("Body Size") + xlab("Order") +
+  theme_Publication() + theme(
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+
+mod = lm(juvMort ~ adMort + svl + class, data = dat)
+summary(mod)
+
+
+ggplot(subset(dat, !is.na(repmode)), aes(log(svl), juvMort, col = order)) +
+  geom_point()+
+  geom_smooth(method = "lm") +
+  xlab("Body Size") + ylab("Juvenile Mortality") +
+  theme_Publication() + theme(
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
+
+
+ggplot(subset(dat, !is.na(repmode)), aes(log(svl), adMort, col = order)) +
+  geom_point()+
+  geom_smooth(method = "gam") +
+  xlab("Body Size") + ylab("Adult Mortality") +
+  theme_Publication() + theme(
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank())+ 
+  scale_color_brewer(palette = "Dark2")
