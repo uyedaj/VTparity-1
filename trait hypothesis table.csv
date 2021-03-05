@@ -1,0 +1,32 @@
+﻿Environment,Stage,Trait, Selective force ,Expected direction of selection,Predicted effect on variance,Notes
+Terrestrial,Egg or juvenile,Size relative to adult mass,Gravity,Decrease,Decrease,Gravid females and offspring must support own weight. Viviparity clearly disadvantageous for this reason (eg birds)
+Terrestrial,Egg or juvenile,Size relative to adult mass,Desiccation,Increase,Decrease,Larger progeny less likely to dry out. Viviparity or other parental care advantagous for this reason
+Terrestrial,Egg or juvenile,Size relative to adult mass,Temperature,Decrease,Increase,"Higher temps = smaller offspring. This could differ between endo- and ecto-therms, but worth noting that for both, the range of temperatures experienced on land is much greater than in the water"
+Terrestrial,Egg or juvenile,Size relative to adult mass,Predation,Increase,Decrease,"Bigger offspring are better but this trades off with offspring number/clutch size, which is itself constrained by adult body size"
+Terrestrial,Egg or juvenile,Size relative to adult mass,Resource competition,Decrease ,Decrease,Usually bigger offspring require more resources  
+Terrestrial,Adult,Body size,Gravity,Decrease ,Decrease,Adults must support their own weight
+Terrestrial,Adult,Body size,Desiccation,Increase,Decrease,Larger individuals less likely to dry out
+Terrestrial,Adult,Body size,Temperature,Decrease,Increase,Elevated temperautres are associated with smaller body sizes
+Terrestrial,Adult,Body size,Predation,Increase ,Decrease,there is a trade-off with age at first reproduction
+Terrestrial,Adult,Body size,Resource competition,Decrease,Increase,Intra-specific competiton can select for larger size if size advantage increases foraging success - but it is tricky to think about within- vs. between species patterns  
+Aquatic,Egg or juvenile,Size relative to adult mass,Dispersal,Decrease ,Increase,Small eggs/larvae can presumably be passively transported greater distances - but if viviparity or other precocial investment evolves this does not hold (Neuheimer et al. 2015)
+Aquatic,Egg or juvenile,Size relative to adult mass,Predation,Increase ,Decrease,bigger offspring are better but this trades off with offspring number
+Aquatic,Egg or juvenile,Size relative to adult mass,Resource competition,Decrease,Increase, Intra-specific competiton can select for larger size if size advantage increases foraging success - but it is tricky to think about within- vs. between species patterns 
+Aquatic,Egg or juvenile,Size relative to adult mass,Dissolved oxygen,Mixed ,unknown,"Oxygen supply has been argued to lead to selection for reduced egg size because of surface-to-volume constraints, but empirical research does not support this idea (Hendry, Day, and Rowe 2003)"
+Aquatic,Adult,Body size,Temperature,Decrease,unknown,Elevated temperautres are associated with smaller body sizes
+Aquatic,Adult,Body size,Predation,Increase ,unknown,but trades off with age at maturity
+Aquatic,Adult,Body size,Sexual selection (Males),increase ,Decrease,Male body size is the most common trait under directional sexual selection
+Aquatic,Adult,Body size,Fecundity selection (females),increase ,Decrease,"Femlaes that are larger have higher clutch sizes in most, if not all, species with indeterminate growth (ectotherms) - marine mammals are an exception, and this is true within viviparous fish but not between viviparous and externally brooding fish"
+Aquatic,Adult,Body size,Resource competition,Increase ,Increase,small eggs/larvae can presumably be passively transported greater distances - but if viviparity or other precocial investment evolves this does not hold (Neuheimer et al. 2015)
+Terrestrial,Adult,Clutch Size,Resource competition,Increase,unknown," Large clutches and/or synchronous reproduction can be selected to saturate predators. Body size, maturation age, and offspring size will all trade off with this trait"
+Terrestrial,Adult,Clutch Size,Predation,Increase  ,unknown," Large clutches and/or synchronous reproduction can be selected to saturate predators, but gravity constraints may oppose it. Body size, maturation age, and offspring size will all trade off with this trait"
+Aquatic,Adult,Clutch Size,Predation,Increase  ,unknown," Large clutches and/or synchronous spawning can be selected to saturate predators. Body size, maturation age, and offspring size will all trade off with this trait"
+Aquatic,Adult,Clutch Size,Resource competition,Increase,unknown," Large clutches and/or synchronous spawning can be selected to saturate predators. Body size, maturation age, and offspring size will all trade off with this trait"
+Terrestrial,Adult,Age at maturation (first reproduction),Predation,Decrease ,unknown,Age at maturation will be later with higher survival (larger body size)
+Aquatic,Adult,Age at maturation (first reproduction),Predation,Decrease ,unknown,Age at maturation will be later with higher survival (larger body size)
+Terrestrial,Adult,Age at maturation (first reproduction),Resource competition,Increase,unknown,"Growth will be slower, and maturation later, when resources are limited"
+Aquatic,Adult,Age at maturation (first reproduction),Resource competition,Increase,unknown,"Growth will be slower, and maturation later, when resources are limited"
+Aquatic,Adult,Lifespan (longevity),Predation,Decrease ,unknown,Predation will shape body size and lifespan at the same time
+Aquatic,Adult,Lifespan (longevity),Resource competition,Increase,unknown,Typically species that evolve to be good competitors live a long time (slow life histories)
+Terrestrial,Adult,Lifespan (longevity),Predation,Decrease ,unknown,Predation will shape body size and lifespan at the same time
+Terrestrial,Adult,Lifespan (longevity),Resource competition,Increase,unknown,Typically species that evolve to be good competitors live a long time (slow life histories)
