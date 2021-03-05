@@ -1,2 +1,2 @@
 # VTparity
-Ectotherm life histories
+Vertebrate life histories
