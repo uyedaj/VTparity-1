@@ -1,0 +1,221 @@
+---
+title: "VT Parity"
+output: html_notebook
+---
+
+
+```{r}
+library(ape)
+library(treeplyr)
+library(rotl)
+library(castor)
+#setwd("~/repos/vtparity")
+dat <- read.csv("./vtparity.csv")
+tree <- read.tree("./tetrapods.tre")
+```
+
+```{r}
+#some functions to match to the OpenTree of Life taxonomy.
+ simpleCap <- function(x) {
+    s <- strsplit(x, " ")[[1]]
+    paste(toupper(substring(s, 1,1)), substring(s, 2),
+          sep="", collapse=" ")
+  }
+  getOttIds <- function(taxalist, ncores=1, context=NULL){
+    scipen <- options()$scipen
+    digits <- options()$digits
+    options("scipen"=100, "digits"=4)
+    .taxalist <- gsub("_", " ", taxalist)
+    .taxalist <- gsub(" sp$", "", .taxalist)
+    tax <- parallel::mclapply(1:length(taxalist),  function(i) try(rotl::tnrs_match_names(.taxalist[i], do_approximate_matching =FALSE, context_name = context)), mc.cores=ncores)
+    failed <- which(sapply(tax,function(x) class(x)[1]=="try-error"))
+    if(length(failed)>0){
+      tax[failed] <- parallel::mclapply(failed,  function(i) try(rotl::tnrs_match_names(.taxalist[i], do_approximate_matching =TRUE, context_name = context)), mc.cores=ncores)
+    }
+    stillfailed <- which(sapply(tax,function(x) if(class(x)[1]=="try-error"){TRUE} else {is.na(x$ott_id)} ))
+    if(length(stillfailed>0)){
+      tax[stillfailed] <- lapply(stillfailed, function(x) data.frame(search_string=.taxalist[x], unique_name=.taxalist[x], approximate_match=NA, ott_id=NA, is_synonym=NA, flags=NA, number_matches=0))
+    }
+    tax <- do.call(rbind, tax)
+    genspec <- unname(sapply(tax[,2], function(x) paste(strsplit(x, split=" ")[[1]][1:2],collapse=" ")))
+    genspec <- gsub(" (genus", " sp.", genspec, fixed=TRUE)
+    genspec <- gsub(" NA", " sp.", genspec, fixed=TRUE)
+    if(sum(duplicated(genspec))>0){
+      cat("Dropping duplicated taxa: ", paste(taxalist[duplicated(genspec)], collapse=", "), "\n")
+    }
+    if(sum(is.na(tax$ott_id))>0){
+      cat("No ott ids found for taxa: ", paste(taxalist[is.na(tax$ott_id)], collapse=", "), "\n")
+    }
+    tax_unique <- tax[!(duplicated(genspec) | is.na(tax$ott_id)),]
+    tax_unique$ottids <- as.character(tax_unique$ott_id)
+    options("scipen"=scipen, "digits"=digits)
+    tax_unique[,1] <- gsub(" ", "_", tax_unique[,1])
+    tax_unique[,1] <- sapply(tax_unique[,1], function(x) simpleCap(x))
+    return(tax_unique)
+  }
+  
+  getTaxonomyTable <- function(taxalist, rank="family"){
+  simpleCap <- function(x) {
+    s <- strsplit(x, " ")[[1]]
+    paste(toupper(substring(s, 1,1)), substring(s, 2),
+          sep="", collapse=" ")
+  }
+  getOttIds <- function(taxalist, ncores=1, context=NULL){
+    scipen <- options()$scipen
+    digits <- options()$digits
+    options("scipen"=100, "digits"=4)
+    .taxalist <- gsub("_", " ", taxalist)
+    .taxalist <- gsub(" sp$", "", .taxalist)
+    tax <- parallel::mclapply(1:length(taxalist),  function(i) try(rotl::tnrs_match_names(.taxalist[i], do_approximate_matching =FALSE, context_name = context)), mc.cores=ncores)
+    failed <- which(sapply(tax,function(x) class(x)[1]=="try-error"))
+    if(length(failed)>0){
+      tax[failed] <- parallel::mclapply(failed,  function(i) try(rotl::tnrs_match_names(.taxalist[i], do_approximate_matching =TRUE, context_name = context)), mc.cores=ncores)
+    }
+    stillfailed <- which(sapply(tax,function(x) if(class(x)[1]=="try-error"){TRUE} else {is.na(x$ott_id)} ))
+    if(length(stillfailed>0)){
+      tax[stillfailed] <- lapply(stillfailed, function(x) data.frame(search_string=.taxalist[x], unique_name=.taxalist[x], approximate_match=NA, ott_id=NA, is_synonym=NA, flags=NA, number_matches=0))
+    }
+    tax <- do.call(rbind, tax)
+    genspec <- unname(sapply(tax[,2], function(x) paste(strsplit(x, split=" ")[[1]][1:2],collapse=" ")))
+    genspec <- gsub(" (genus", " sp.", genspec, fixed=TRUE)
+    genspec <- gsub(" NA", " sp.", genspec, fixed=TRUE)
+    if(sum(duplicated(genspec))>0){
+      cat("Dropping duplicated taxa: ", paste(taxalist[duplicated(genspec)], collapse=", "), "\n")
+    }
+    if(sum(is.na(tax$ott_id))>0){
+      cat("No ott ids found for taxa: ", paste(taxalist[is.na(tax$ott_id)], collapse=", "), "\n")
+    }
+    tax_unique <- tax[!(duplicated(genspec) | is.na(tax$ott_id)),]
+    tax_unique$ottids <- as.character(tax_unique$ott_id)
+    options("scipen"=scipen, "digits"=digits)
+    tax_unique[,1] <- gsub(" ", "_", tax_unique[,1])
+    tax_unique[,1] <- sapply(tax_unique[,1], function(x) simpleCap(x))
+    return(tax_unique)
+  }
+  otts <- getOttIds(taxalist)
+  taxonomies <- lapply(otts$ott_id, function(x) rotl::taxonomy_taxon_info(x, include_lineage = TRUE))
+  taxonomies <- lapply(taxonomies, function(x) do.call(rbind, x[[1]]$lineage))
+  taxonomies <- lapply(taxonomies, function(x) x[x[,"rank"]==rank,])
+  taxtable <- do.call(rbind, taxonomies)
+  return(taxtable)
+}
+```
+
+Match the names to the Open Tree of Life taxonomy to match it to the names on the tree:
+```{r}
+dat$species <- gsub(" ", "_", dat$species)
+ott_table <- getOttIds(dat$species, ncores=2)
+saveRDS(ott_table, file="./ott_table_data.rds")
+```
+
+```{r}
+ott_table <- readRDS(file="./ott_table_data.rds")
+# Function to get the taxonomy
+otts <- ott_table
+rank <- "class"
+.taxonomies <- lapply(otts[,'ott_id'], function(x) rotl::taxonomy_taxon_info(x, include_lineage = TRUE))
+taxonomies <- lapply(.taxonomies, function(x) do.call(rbind, x[[1]]$lineage))
+ranks <- c("genus", "family", "infraorder", "order", "superorder", "order", "subclass", "class", "superclass", "subphylum", "phylum")
+taxtable <- data.frame(matrix(NA, nrow=length(taxonomies), ncol=length(ranks)))
+colnames(taxtable) <- ranks
+taxtable$species <- otts[,'unique_name']
+for(j in 1:length(ranks)){
+  for(i in 1:length(taxonomies)){
+  log.test <- unlist(taxonomies[[i]][,'rank'])==ranks[j]
+  if(any(log.test)){
+    taxtable[i, ranks[j]] <- taxonomies[[i]][log.test, "name"][[1]]
+  } else {
+    taxtable[i, ranks[j]] <-NA
+  }
+}
+}
+saveRDS(taxtable, "./ott_tax_table.rds")
+```
+
+
+```{r}
+#Read taxonomy table back in
+ott_table <- readRDS(file="./ott_table_data.rds")
+tax_table <- readRDS("./ott_tax_table.rds")
+dat$genspec <- NA # Create genspec
+index <- match(ott_table$search_string, gsub(" ", "_", dat$species)) #match ott_table to data table
+drop <- which(is.na(index)) #Some failed, record these
+dat$genspec[index[-drop]] <- ott_table$unique_name[-drop] # Give the ott names to genspec
+ndat <- filter(dat, !is.na(genspec)) # Keep only the ones that worked
+ndat$genspec <- gsub(" ", "_", ndat$genspec) #underscores
+td <- make.treedata(tree, ndat)#match tree and data. 
+
+saveRDS(td, "./treedata_matched.rds")
+```
+
+```{r}
+td <- readRDS("./treedata_matched.rds")
+```
+
+
+```{r}
+
+rmtd <- filter(td, !is.na(repmode))
+priortable <- matrix(0, nrow=length(rmtd$phy$tip.label), ncol=4)
+x <-y <-0
+for(i in 1:nrow(priortable)){
+  if(rmtd[['repmode']][i]==1){
+    if(x==0){
+       priortable[i, c(3,4)] <- c(1,0)
+       x <- 5
+    } else {
+       priortable[i, c(3,4)] <- NA
+    }
+   
+    
+  } else {
+    if(y==0){
+       priortable[i, c(1,2)] <- c(1,0)
+       y <- 5
+    } else {
+    priortable[i, c(1,2)] <- NA
+    }
+  }
+}
+
+```
+
+```{r}
+rmASR <- castor::asr_mk_model(rmtd$phy, tip_states=rmtd[['repmode']]+1, Nstates=2, rate_model = "ARD")
+```
+
+
+```{r}
+#pdf("./repmode.pdf", height=100, width=6)
+plot(rmtd$phy, type="fan", show.tip.label=FALSE, cex=0.2)
+nodelabels(cex=0.25, pie=rmASR$ancestral_likelihoods, piecol=c("#bdc3c7", "#e74c3c"), col="transparent", lwd=0.01)
+tiplabels(cex=0.25, pch=21, bg=c("#bdc3c7", "#e74c3c")[rmtd[['repmode']]+1], col=c("#bdc3c7", "#e74c3c")[rmtd[['repmode']]+1])
+#nodelabels(cex=0.25, pie=rmASR$likelihoods, piecol=c("#bdc3c7", "#34495e", "#e74c3c", "#f1c40f"), col="transparent", lwd=0.01)
+#tiplabels(cex=0.25, pch=21, bg=c("#bdc3c7", "#e74c3c")[rmtd[['repmode']]+1], col=c("#bdc3c7", "#e74c3c")[rmtd[['repmode']]+1])
+#dev.off()
+```
+
+
+```{r}
+plot(rmtd[['log.AaM']], rmtd[['juvMort']])
+
+
+
+```
+
+
+
+```{r}
+library(phylolm)
+
+rmtd <- filter(rmtd, !is.na(juvMort), !is.na(adMort))
+rownames(rmtd$dat) <- rmtd$phy$tip.label
+glmfit <- phylolm(repmode ~ juvMort*adMort, data=rmtd$dat, phy=rmtd$phy)
+rmtd$dat$repmort <- resid(glmfit)
+
+plot(rmtd$dat$repmort, rmtd$dat$AdTerr)
+rownames(rmtd$dat) <- rmtd$phy$tip.label
+summary(phylolm(repmort ~ AdTerr, data=rmtd$dat, phy=rmtd$phy))
+
+```
+
