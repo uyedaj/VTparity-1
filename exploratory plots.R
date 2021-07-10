@@ -149,26 +149,26 @@ ggplot(dat, aes(log(reloff), log(juvMort/adMort), color = class)) +
 dat$order = factor(dat$order, levels = c("Fish", "Sharks", "Anura", "Caudata", "Crocodilia", "Testudines", "Squamata", "Aves", "Mammalia"))
 
 
-ggplot(dat, aes(log(AaM), log(longevity), color = class)) +
-  geom_point() +
-  geom_smooth(method = "glm") +
-  xlab("Age at Maturity") + ylab("Longevity") +
-  theme_Publication() + theme(
-    axis.text.y = element_blank(),
-    axis.ticks = element_blank())+ 
-  scale_color_brewer(palette = "Dark2")
+#ggplot(dat, aes(log(AaM), log(longevity), color = class)) +
+#  geom_point() +
+#  geom_smooth(method = "glm") +
+#  xlab("Age at Maturity") + ylab("Longevity") +
+#  theme_Publication() + theme(
+#    axis.text = element_blank(),
+#    axis.ticks = element_blank())+ 
+#  scale_color_brewer(palette = "Dark2")
 
-ggplot(dat, aes(log(AaM), juvMort, color = class)) +
-  geom_point() +
-  geom_smooth(method = "glm") +
-  xlab("Age at Maturity") + ylab("Juvenile Mortality") +
-  theme_Publication() + theme(
-    axis.text.y = element_blank(),
-    axis.text.x = element_blank(),
-    axis.ticks = element_blank())+ 
-  scale_color_brewer(palette = "Dark2")
+#ggplot(x, aes(log(AaM), juvMort, color = class)) +
+#  geom_point() +
+#  geom_smooth(method = "glm") +
+#  xlab("Age at Maturity") + ylab("Juvenile Mortality") +
+#  theme_Publication() + theme(
+#    axis.text.y = element_blank(),
+#    axis.text.x = element_blank(),
+#    axis.ticks = element_blank())+ 
+#  scale_color_brewer(palette = "Dark2")
 
-ggplot(dat, aes(adMort, juvMort, color = class)) +
+ggplot(x, aes(adMort, juvMort, color = class)) +
   geom_point() +
   xlab("Adult Mortality") + ylab("Juvenile Mortality") +
   theme_Publication() + theme(
@@ -242,11 +242,11 @@ ggplot(subset(dat, !is.na(repmode)), aes(order, log(svl-birth.svl), col = repmod
     axis.ticks = element_blank())+ 
   scale_color_brewer(palette = "Dark2")
 
-dat$adMortScal = scale(dat$adMort)
-dat$juvMortScal = scale(dat$juvMort)
-dat$totMort = dat$adMortScal + dat$juvMortScal
+x$adMortScal = scale(x$adMort)
+x$juvMortScal = scale(x$juvMort)
+x$totMort = x$adMortScal + x$juvMortScal
 
-ggplot(subset(dat, !is.na(repmode)), aes(order, totMort, col = order, size = svl)) +
+ggplot(subset(x, !is.na(repmode)), aes(class, totMort, col = class, size = svl)) +
   geom_sina() +
   xlab("") + ylab("Lifetime Mortality") +
   theme_Publication() + theme(    
@@ -380,7 +380,7 @@ ggplot(dat, aes(adMort, stat(count), fill = class)) +
 
 
 # relationship between max size and adult mortality (!!! have mass for some, lenght for others)
-ggplot(dat, aes(x = jitter(adMort), y = log(svl), colour = class)) +
+ggplot(x, aes(x = jitter(adMort), y = log(svl), colour = class)) +
   geom_point() +
   geom_smooth(method = "lm") +
   xlab("Adult Mortality") + ylab("Maximum Size") +
@@ -388,9 +388,9 @@ ggplot(dat, aes(x = jitter(adMort), y = log(svl), colour = class)) +
     axis.text.x = element_blank(),
     axis.text.y = element_blank(),
     axis.ticks = element_blank())+ 
-  scale_color_brewer(palette="Paired")
+  scale_color_brewer(palette="Dark2")
 
-ggplot(dat, aes(x = log(svl), y = log(birth.svl), colour = repmode, shape = class)) +
+ggplot(x, aes(x = log(svl), y = log(birth.svl), colour = repmode, shape = class)) +
   geom_point() +
   geom_smooth(method = "lm") +
   xlab("Max Size") + ylab("Offspring Size") +
@@ -413,7 +413,7 @@ ggplot(dat, aes(x = log(svl), y = log(birth.svl), shape = class, colour = repmod
 dat2 = x %>%
   filter(class == "Amphibia" | order == "Squamata")
 
-ggplot(dat, aes(x = juvMort, y = log(birth.svl), colour = repmode, size = svl)) +
+ggplot(x, aes(x = juvMort, y = log(birth.svl), colour = repmode, size = svl)) +
   geom_point() +
   xlab("Juvenile Mortality") + ylab("Offspring Size") +
   theme_Publication() + theme(
