@@ -69,10 +69,10 @@ Batoidea,Myliobatiformes,Gymnuridae,Gymnura_poecilura,live-bearing,matrotroph,ma
 Batoidea,Myliobatiformes,Gymnuridae,Gymnura_zonura,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,,3,,,,,0.0268,2.96,48,108,20.5,Shelf,20
 Batoidea,Myliobatiformes,Hexatrygonidae,Hexatrygon_bickelli,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,,2,,,,,0.01,3.04,113,168,48,Deep,741
 Batoidea,Myliobatiformes,Mobulidae,Manta_birostris,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,,1,,9,40,,0.011355,3,400,700,135.5,Pelagic,60
-Batoidea,Myliobatiformes,Mobulidae,Mobula_hypostoma,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,,1,2,,,,4.29E-10,3.4,111,120,55,Pelagic,50
+Batoidea,Myliobatiformes,Mobulidae,Mobula_hypostoma,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,,1,2,,,,0.0016,3.27,111,120,55,Pelagic,50
 Batoidea,Myliobatiformes,Mobulidae,Mobula_japanica,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,,1,2,,14,0.277,0.0016,3.27,207,310,81,Pelagic,50
 Batoidea,Myliobatiformes,Mobulidae,Mobula_kuhlii,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,,1,2,,,,0.0016,3.27,,120,31,Pelagic,50
-Batoidea,Myliobatiformes,Mobulidae,Mobula_munkiana,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,,1,,,,,0.000001041,2.34,97,110,35.5,Pelagic,7.5
+Batoidea,Myliobatiformes,Mobulidae,Mobula_munkiana,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,,1,,,,,0.01,3.04,97,110,35.5,Pelagic,7.5
 Batoidea,Myliobatiformes,Mobulidae,Mobula_tarapacana,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,,1,,,,,2.38E-08,2.92,275,370,105,Pelagic,10
 Batoidea,Myliobatiformes,Mobulidae,Mobula_thurstoni,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,12,1,2,,14,0.277,4.82E-08,2.78,150,220,75,Pelagic,50
 Batoidea,Myliobatiformes,Myliobatidae,Aetobatus_flagellum,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,,3.5,1,6,16,0.215,0.0076,3.08,90,150,33.4,Shelf,40
@@ -87,7 +87,7 @@ Batoidea,Myliobatiformes,Myliobatidae,Myliobatis_goodei,live-bearing,matrotroph,
 Batoidea,Myliobatiformes,Myliobatidae,Myliobatis_longirostris,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,,,,,,,0.0076,3.08,74,95,,Shelf,32
 Batoidea,Myliobatiformes,Myliobatidae,Myliobatis_tobijei,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,,8,,,,,0.0076,3.08,,114,,Shelf,100.5
 Batoidea,Myliobatiformes,Myliobatidae,Pteromylaeus_bovinus,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,8,3.5,,1.2,,,0.0076,3.08,100,175,35,Shelf,30
-Batoidea,Myliobatiformes,Plesiobatidae,Plesiobatis_daviesi,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,,,,,,,6.31E-12,3.17,194.5,270,50,Deep,515
+Batoidea,Myliobatiformes,Plesiobatidae,Plesiobatis_daviesi,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,,,,,,,1.00E-02,3.04,194.5,270,50,Deep,515
 Batoidea,Myliobatiformes,Potamotrygonidae,Paratrygon_aiereba,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,9,2,2,,,,0.0113,3,72,130,16,Freshwater,5
 Batoidea,Myliobatiformes,Potamotrygonidae,Plesiotrygon_iwamae,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,8,2,,,,,0.0113,3,50,65,,Freshwater,5
 Batoidea,Myliobatiformes,Potamotrygonidae,Potamotrygon_castexi,live-bearing,matrotroph,matrotrophic_lb,Lipid Histotrophy,4,,,,,,0.0113,3,,60,,Freshwater,5
