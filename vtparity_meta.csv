@@ -1,0 +1,20 @@
+order,order
+class,class
+family,family
+species,genus_species
+AaM,age at maturity
+log.AaM,log(age at maturity)
+adMort,adult mortality
+svl,maximum body size
+repmode,"reproductive mode (0 = egg-layer, 1=viviparity)"
+juvTerr,"egg location (0 = water, 1 = land)"
+birth.svl,offspring size
+longevity,maximum longevity
+juvSurv,log(lifetime egg production)
+juvMort,1/log(lifetime egg production)
+AdTerr,"adult location (0 = water, 1 = land)"
+mass,maximum adult mass
+birth.mass,offspring mass
+RCM,relative clutch mass
+IPB,relative investment per breeding bout
+reloff,relative offspring size
