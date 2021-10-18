@@ -1,0 +1,964 @@
+---
+title: "VT Parity"
+output: html_notebook
+---
+
+Initial packages
+
+```{r}
+rm(list=ls(all=TRUE))
+library(ape)
+library(treeplyr)
+library(rotl)
+library(castor)
+library(geiger)
+library(phytools)
+library(phylolm)
+dat <- read.csv("../datasets/vtparity.csv")
+```
+
+I. Tree Generation - Can Skip to II and just load synthesis td.
+```{r eval=FALSE}
+amphib <- drop.tip(read.tree("./amph_shl_new_Consensus_7238.tre"), "Homo_sapiens") #Jetz & Pyron 2018
+birds <- read.tree("~/repos/bmr/datasets/bird.tre") #Jetz 
+squam <- read.tree("~/repos/vtparity/squamates/squam_shl_new_Consensus_9755.tre") #Tonini
+mamm <- read.tree("~/repos/bmr/datasets/fullnewmammal.tre") # Me
+sharktree <- read.nexus("./10cal.tree250.nex") #Mull 
+fishtree <- read.tree("./actinopt_12k_treePL.tre") #Rabosky
+trees <- list("sharks"=sharktree, "fish"=fishtree, "amphib"=amphib, "squamates"=squam, "birds"=birds, "mamm"=mamm)
+
+```
+
+```{r eval=FALSE}
+ntips <- 6
+tip.labels <- c("sharks","fish", "amphib", "squamates", "birds", "mamm")
+edge <- matrix(c(11, 5,
+  11, 4,
+  10, 11,
+  10, 6,
+  9, 3,
+  9, 10,
+  8, 9,
+  8, 2,
+  7, 8,
+  7, 1), byrow=TRUE, ncol=2)
+#Medians:
+edge.length <- c(282, 282, 318-282, 318, 351.7, 351.7-318, 433-351.7, 433, 465-433, 465)
+#Means
+#edge.length <- c(280, 280, 312-280, 312, 378.3, 378.3-312, 435-378.3, 435, 473-435, 473)
+Nnode <- 5
+ordertree <- list(edge=edge, Nnode=Nnode, tip.label=tip.labels, edge.length=edge.length)
+class(ordertree) <- 'phylo'
+ordertree <- reorder.phylo(ordertree, "postorder")
+plot(ordertree)
+```
+
+```{r eval=FALSE}
+otax <- data.frame("Class"= ordertree$tip.label, "Superclass"=c("Chondrichthyes", "Actinopterygii", rep("Tetrapoda",4)))
+rownames(otax) <- ordertree$tip.label
+classtree <- nodelabel.phylo(ordertree, otax, ncores=1)
+
+#trees <- lapply(tds, function(x) x$phy)
+trees <- lapply(trees, multi2di)
+class(trees) <- "multiPhylo"
+plot(classtree)
+abline(v=sapply(trees, function(x) max(nodeHeights(x))),lty=2)
+res <- glomogram.phylo(classtree, trees)
+saveRDS(res, file="./allchordates.rds")
+```
+
+
+
+```{r}
+#some functions to match to the OpenTree of Life taxonomy.
+ simpleCap <- function(x) {
+    s <- strsplit(x, " ")[[1]]
+    paste(toupper(substring(s, 1,1)), substring(s, 2),
+          sep="", collapse=" ")
+  }
+  getOttIds <- function(taxalist, ncores=1, context=NULL){
+    scipen <- options()$scipen
+    digits <- options()$digits
+    options("scipen"=100, "digits"=4)
+    .taxalist <- gsub("_", " ", taxalist)
+    .taxalist <- gsub(" sp$", "", .taxalist)
+    tax <- parallel::mclapply(1:length(taxalist),  function(i) try(rotl::tnrs_match_names(.taxalist[i], do_approximate_matching =FALSE, context_name = context)), mc.cores=ncores)
+    failed <- which(sapply(tax,function(x) class(x)[1]=="try-error"))
+    if(length(failed)>0){
+      tax[failed] <- parallel::mclapply(failed,  function(i) try(rotl::tnrs_match_names(.taxalist[i], do_approximate_matching =TRUE, context_name = context)), mc.cores=ncores)
+    }
+    stillfailed <- which(sapply(tax,function(x) if(class(x)[1]=="try-error"){TRUE} else {is.na(x$ott_id)} ))
+    if(length(stillfailed>0)){
+      tax[stillfailed] <- lapply(stillfailed, function(x) data.frame(search_string=.taxalist[x], unique_name=.taxalist[x], approximate_match=NA, ott_id=NA, is_synonym=NA, flags=NA, number_matches=0))
+    }
+    tax <- do.call(rbind, tax)
+    genspec <- unname(sapply(tax[,2], function(x) paste(strsplit(x, split=" ")[[1]][1:2],collapse=" ")))
+    genspec <- gsub(" (genus", " sp.", genspec, fixed=TRUE)
+    genspec <- gsub(" NA", " sp.", genspec, fixed=TRUE)
+    if(sum(duplicated(genspec))>0){
+      cat("Dropping duplicated taxa: ", paste(taxalist[duplicated(genspec)], collapse=", "), "\n")
+    }
+    if(sum(is.na(tax$ott_id))>0){
+      cat("No ott ids found for taxa: ", paste(taxalist[is.na(tax$ott_id)], collapse=", "), "\n")
+    }
+    tax_unique <- tax[!(duplicated(genspec) | is.na(tax$ott_id)),]
+    tax_unique$ottids <- as.character(tax_unique$ott_id)
+    options("scipen"=scipen, "digits"=digits)
+    tax_unique[,1] <- gsub(" ", "_", tax_unique[,1])
+    tax_unique[,1] <- sapply(tax_unique[,1], function(x) simpleCap(x))
+    return(tax_unique)
+  }
+  
+  getTaxonomyTable <- function(taxalist, rank="family"){
+  simpleCap <- function(x) {
+    s <- strsplit(x, " ")[[1]]
+    paste(toupper(substring(s, 1,1)), substring(s, 2),
+          sep="", collapse=" ")
+  }
+  getOttIds <- function(taxalist, ncores=1, context=NULL){
+    scipen <- options()$scipen
+    digits <- options()$digits
+    options("scipen"=100, "digits"=4)
+    .taxalist <- gsub("_", " ", taxalist)
+    .taxalist <- gsub(" sp$", "", .taxalist)
+    tax <- parallel::mclapply(1:length(taxalist),  function(i) try(rotl::tnrs_match_names(.taxalist[i], do_approximate_matching =FALSE, context_name = context)), mc.cores=ncores)
+    failed <- which(sapply(tax,function(x) class(x)[1]=="try-error"))
+    if(length(failed)>0){
+      tax[failed] <- parallel::mclapply(failed,  function(i) try(rotl::tnrs_match_names(.taxalist[i], do_approximate_matching =TRUE, context_name = context)), mc.cores=ncores)
+    }
+    stillfailed <- which(sapply(tax,function(x) if(class(x)[1]=="try-error"){TRUE} else {is.na(x$ott_id)} ))
+    if(length(stillfailed>0)){
+      tax[stillfailed] <- lapply(stillfailed, function(x) data.frame(search_string=.taxalist[x], unique_name=.taxalist[x], approximate_match=NA, ott_id=NA, is_synonym=NA, flags=NA, number_matches=0))
+    }
+    tax <- do.call(rbind, tax)
+    genspec <- unname(sapply(tax[,2], function(x) paste(strsplit(x, split=" ")[[1]][1:2],collapse=" ")))
+    genspec <- gsub(" (genus", " sp.", genspec, fixed=TRUE)
+    genspec <- gsub(" NA", " sp.", genspec, fixed=TRUE)
+    if(sum(duplicated(genspec))>0){
+      cat("Dropping duplicated taxa: ", paste(taxalist[duplicated(genspec)], collapse=", "), "\n")
+    }
+    if(sum(is.na(tax$ott_id))>0){
+      cat("No ott ids found for taxa: ", paste(taxalist[is.na(tax$ott_id)], collapse=", "), "\n")
+    }
+    tax_unique <- tax[!(duplicated(genspec) | is.na(tax$ott_id)),]
+    tax_unique$ottids <- as.character(tax_unique$ott_id)
+    options("scipen"=scipen, "digits"=digits)
+    tax_unique[,1] <- gsub(" ", "_", tax_unique[,1])
+    tax_unique[,1] <- sapply(tax_unique[,1], function(x) simpleCap(x))
+    return(tax_unique)
+  }
+  otts <- getOttIds(taxalist)
+  taxonomies <- lapply(otts$ott_id, function(x) rotl::taxonomy_taxon_info(x, include_lineage = TRUE))
+  taxonomies <- lapply(taxonomies, function(x) do.call(rbind, x[[1]]$lineage))
+  taxonomies <- lapply(taxonomies, function(x) x[x[,"rank"]==rank,])
+  taxtable <- do.call(rbind, taxonomies)
+  return(taxtable)
+}
+```
+
+Match the names to the Open Tree of Life taxonomy to match it to the names on the tree:
+```{r}
+dat$species <- gsub(" ", "_", dat$species)
+ott_table <- getOttIds(dat$species, ncores=2)
+saveRDS(ott_table, file="../output/ott_table_data.rds")
+```
+
+
+```{r}
+#ott_table_fish <- getOttIds(dat$species[dat$class=="Actinopterygii"], ncores=3)
+#ott_table <- readRDS("./ott_table_data.rds")
+#ott_table_full <- rbind(ott_table_fish, ott_table)
+#saveRDS(ott_table_full, file="~/repos/vtparity/ott_table_full.rds")
+```
+
+```{r}
+ott_table <- readRDS(file="../output/ott_table_data.rds")
+# Function to get the taxonomy
+otts <- ott_table
+rank <- "class"
+.taxonomies <- lapply(otts[,'ott_id'], function(x) rotl::taxonomy_taxon_info(x, include_lineage = TRUE))
+taxonomies <- lapply(.taxonomies, function(x) do.call(rbind, x[[1]]$lineage))
+ranks <- c("genus", "family", "infraorder", "order", "superorder", "order", "subclass", "class", "superclass", "subphylum", "phylum")
+taxtable <- data.frame(matrix(NA, nrow=length(taxonomies), ncol=length(ranks)))
+colnames(taxtable) <- ranks
+taxtable$species <- otts[,'unique_name']
+for(j in 1:length(ranks)){
+  for(i in 1:length(taxonomies)){
+  log.test <- unlist(taxonomies[[i]][,'rank'])==ranks[j]
+  if(any(log.test)){
+    taxtable[i, ranks[j]] <- taxonomies[[i]][log.test, "name"][[1]]
+  } else {
+    taxtable[i, ranks[j]] <-NA
+  }
+}
+}
+saveRDS(taxtable, "../output/ott_tax_table.rds")
+```
+
+
+```{r}
+#Read taxonomy table back in
+ott_table <- readRDS(file="../output/ott_table_data.rds")
+tax_table <- readRDS("../output/ott_tax_table.rds")
+tree <- readRDS("../output/allchordates_new.rds")
+dat$genspec <- NA # Create genspec
+index <- match(ott_table$search_string, gsub(" ", "_", dat$species)) #match ott_table to data table
+drop <- which(is.na(index)) #Some failed, record these
+dat$genspec[index[-drop]] <- ott_table$unique_name[-drop] # Give the ott names to genspec
+ndat <- filter(dat, !is.na(genspec)) # Keep only the ones that worked
+ndat$genspec <- gsub(" ", "_", ndat$genspec) #underscores
+td <- make.treedata(tree, ndat)#match tree and data. 
+saveRDS(td, "../output/chordatedata_matched_new.rds")
+```
+
+```{r}
+library(dplyr)
+
+lens <- read.csv("../datasets/VTparity_length_mass.csv")
+#taking the mean for each species
+length(lens$Species)
+g <- aggregate(cbind(lens$a, lens$b), by = list(lens$Species), mean)
+colnames(g) <- c("Species", "a", "b")
+shark_lens <- read.csv("../datasets/Shark.VTparity.data.csv")
+shark_lens <- select(shark_lens, c(4,15,16))
+colnames(shark_lens) <- c("Species",  "a","b")
+lens_attempt <- merge(lens, shark_lens, by = "Species")
+colnames(lens_attempt) <- c("Species","X", "a1","b1","a","b")
+
+# changing values when they are different
+ind <- which(lens_attempt$a1 != lens_attempt$a)
+change <- lens_attempt[ind,]
+lens_shark <- data.frame(lens$Species, lens$a, lens$b)
+colnames(lens_shark) <- c("species","a","b")
+#old_dat <- read.csv("../datasets/vtparity.csv")
+dat <- read.csv("../datasets/vtparity.csv")
+dat <- data.frame(dat)
+
+#merging the two 
+#full_dat <- merge(dat, lens_shark, by = "species", all.x = T)
+
+g <- data.frame(g)
+names(g) <- c("species", "a","b")
+
+# combo of both datasets 
+get <- plyr::join(g, dat, by = 'species', type = "full")
+
+#get_mass <- mutate(get, mass_est = a * (svl^b))
+
+#converting 
+get$a <- ifelse(get$a < 0, yes = exp(get$a), get$a)
+
+transformed_dat <- saveRDS(get, file = "../output/transformed_dat.RDS")
+
+get_mass_con <- mutate(get, lnSVL = log(svl), logMass = log(mass))
+
+get_mass_jo <- mutate(get_mass_con, logEstMass = b * lnSVL + log((a)))
+
+#saving 
+saveRDS(get_mass_jo, file = "../output/NB_massEst.RDS")
+mass_est <- readRDS("../output/NB_massEst.RDS")
+
+lm1 <- lm(mass_est$logEstMass / 3 ~  mass_est$lnSVL)
+#main plot
+plot(mass_est$lnSVL, mass_est$logEstMass / 3, pch = 16, cex = 1.3, col = "red", 
+     main = "log(estMass)/3 and lnSVL", xlab = "lnSVL", ylab = " log(estMass) / 3")
+abline(lm1)
+
+# dropping based on residual
+lm1.res <- (resid(lm1))
+plot(lm1.res)
+res_ind <- (which((lm1.res) < -2))
+r <- as.data.frame(res_ind)
+q <- as.numeric(rownames(r))
+res_ind <- c(r$res_ind, q)
+# outliers based on the residuals, not sure whether the reptiles should be dropped
+res_out <- mass_est[res_ind,]
+
+# dropped dataset 
+mass_est <- mass_est[-res_ind, ]
+saveRDS(mass_est, file = "../output/NB_massEst_NoOutliers.RDS")
+
+par(mfrow = c(2,1))
+hist(get_mass_jo$a)
+hist(res_out$a)
+
+
+# things to be dropped based on svl and estMass
+ind_out <- which(get_mass_jo$logEstMass < 0 & get_mass_jo$lnSVL > 2.5)
+eye_out <- get_mass_jo[ind_out,]
+
+par(mfrow = c(2,1))
+hist(eye_out$a)
+hist(res_out$a)
+
+```
+
+
+II. Load in matched tree and data. 
+  
+```{r}
+td0 <- readRDS("../output/chordatedata_matched_new.rds")
+newmass <- readRDS("../output/NB_massEst_NoOutliers.RDS")
+mergemass <- left_join(td0$dat, newmass)
+mergemass <- mutate(mergemass, lnSize=ifelse(is.na(logMass)==TRUE, logEstMass/3, logMass/3))
+mergemass$lnSize[mergemass$class=="Actinopterygii" & is.na(mergemass$lnSize)] <- (3.0904 * mergemass$svl[mergemass$class=="Actinopterygii" & is.na(mergemass$lnSize)]^0.007)/3
+mergemass$species <- td0$phy$tip.label
+td <- make.treedata(td0$phy, mergemass)
+```
+
+Can skip these. Comparison with timetree of life.
+
+```{r eval=FALSE}
+# With the timetree of life
+ttol <- load("~/repos/aRbor/treetimer/data/ttolData.rda")
+td2 <- make.treedata(ttolData$phy, ndat)
+```
+
+```{r eval=FALSE}
+cat("Original dataset \n")
+table(dat[['class']])
+cat("My supertree \n")
+table(td[['order']])
+#cat("TimeTree of Life \n")
+#table(td2[['order']])
+```
+
+III. Exploration with castor and juvenile/adult terrestriality. Doesn't work great!!!
+
+```{r eval=FALSE}
+
+rmtd <- filter(td, !is.na(repmode))
+priortable <- matrix(0, nrow=length(rmtd$phy$tip.label), ncol=4)
+x <-y <-0
+for(i in 1:nrow(priortable)){
+  if(rmtd[['repmode']][i]==1){
+    if(x==0){
+       priortable[i, c(3,4)] <- c(1,0)
+       x <- 5
+    } else {
+       priortable[i, c(3,4)] <- NA
+    }
+   
+    
+  } else {
+    if(y==0){
+       priortable[i, c(1,2)] <- c(1,0)
+       y <- 5
+    } else {
+    priortable[i, c(1,2)] <- NA
+    }
+  }
+}
+
+```
+
+```{r}
+rmtd <- filter(td, !is.na(repmode))#removing NAs
+
+```
+
+```{r}
+rmMtd <- rmtd#filter(rmtd, !is.na(adMort), !order %in% c("Anura", "Caudata", "Gymnophiona"))
+p1 <- contMap(rmMtd$phy, rmMtd[['repmode']], fsize=0.1)
+p1 <- setMap(p1, c("#3498db", "#f1c40f", "#e74c3c"))
+pdf("./repmode.pdf", height=20, width=20)
+plot(p1, fsize=0.2, type="fan")
+dev.off()
+```
+
+```{r}
+rmASR <- castor::asr_mk_model(rmtd$phy, rmtd[['repmode']]+1, rate_model = "ARD") #ancestral state for reproductive mode
+
+```
+
+
+```{r}
+#pdf("./repmode.pdf", height=100, width=6)
+plot(rmtd$phy, type="fan", show.tip.label=FALSE, cex=0.2)
+# ancestral state for ad and juv enviornment 
+terr2td <- filter(td, !is.na(AdTerr)) # this has 14k juv and adult, removing NA 
+# converting to 00 -- 11
+t2 <- terr2td$dat
+t2['new'] <- NA
+t2$new <- as.integer(case_when(
+      t2$juvTerr == 1 & t2$AdTerr == 1 ~ "1",
+      t2$juvTerr == 1 & t2$AdTerr == 0 ~ "2",
+      t2$juvTerr == 0 & t2$AdTerr == 1 ~ "3",
+      t2$juvTerr == 0 & t2$AdTerr == 0 ~ "4"
+    ))
+Ad_ASR <- castor::asr_mk_model(tree = terr2td$phy, tip_states = t2$new, rate_model = "ARD")
+solution <- Ad_ASR$transition_matrix
+rownames(solution) <- c("11","10","01","00")
+colnames(solution) <- c("11","10","01","00")
+solution
+```
+
+```{r}
+# meh
+pdf("./JuvAdTerr.pdf", height=100, width=6)
+plot(terr2td$phy, show.tip.label=TRUE, cex=0.2)
+nodelabels(cex=0.25, pie=Ad_ASR$ancestral_likelihoods,piecol=c("blue","green","red","purple"), col="transparent", lwd=0.01)
+tiplabels(cex=0.25, pch=21, bg=c("blue", "green", "red", "purple")[t2[['new']]], col=c("blue", "green", "red", "purple")[t2[['new']]])
+dev.off()
+```
+
+
+```{r}
+pdf("./repmode_full.pdf", height=100, width=6)
+plot(rmtd$phy, show.tip.label=TRUE, cex=0.2)
+nodelabels(cex=0.25, pie=rmASR$ancestral_likelihoods, piecol=c("#bdc3c7", "#e74c3c"), col="transparent", lwd=0.01)
+tiplabels(cex=0.25, pch=21, bg=c("#bdc3c7", "#e74c3c")[rmtd[['repmode']]+1], col=c("#bdc3c7", "#e74c3c")[rmtd[['repmode']]+1])
+#nodelabels(cex=0.25, pie=rmASR$likelihoods, piecol=c("#bdc3c7", "#34495e", "#e74c3c", "#f1c40f"), col="transparent", lwd=0.01)
+#tiplabels(cex=0.25, pch=21, bg=c("#bdc3c7", "#e74c3c")[rmtd[['repmode']]+1], col=c("#bdc3c7", "#e74c3c")[rmtd[['repmode']]+1])
+dev.off()
+```
+
+
+```{r}
+plot(rmtd[['log.AaM']], rmtd[['juvMort']])
+```
+
+IV. Phylolm analyses
+Get cases that have reproductive mode
+```{r}
+library(phylolm)
+rmtd <- filter(td, !is.na(repmode))#removing NAs
+table(rmtd$dat$order)
+rmtd <- mutate(rmtd, scjMort = scale(juvMort)[,1], scadMort = scale(adMort)[,1], lnLongevity=log(longevity))
+rmtd$dat$species <- rmtd$phy$tip.label
+#rmtd$dat$AdTerr[is.na(rmtd$dat$AdTerr) & rmtd$dat$order=="Squamata"] <- 1
+```
+
+
+Load in size estimates for non-bird/mammals from a threshold model - THESE ARE TERRIBLE! Need a better link between SVL and MASS.
+```{r}
+#nonmammsize <- readRDS("./sizeEstDF.rds")
+rmtd <- mutate(rmtd, lnSize = logMass3, lnLifespan = log(longevity))
+
+splist1 <- gsub(" ", "_", nonmammsize$species)
+splist2 <- gsub(" ", "_", rmtd$dat$species)
+nonmammsize <- nonmammsize[-which(!splist1 %in% splist2),]
+splist1 <- splist1[-which(!splist1 %in% splist2)]
+index <- match(splist1, splist2)
+rmtd$dat$lnSize[index] <- nonmammsize$size.thresh
+rmtd$dat$lnLifespan[index] <- nonmammsize$lifespan.thresh
+plot(rmtd$dat$lnLongevity, rmtd$dat$lnLifespan)
+plot(rmtd$dat$lnMass3, rmtd$dat$lnSize)
+```
+
+Try again but with a regression approach
+```{r}
+#Regression approach to combining size
+lmsize <- lm(I(rmtd$dat$lnMass/3) ~ rmtd$dat$lnSVL)
+#nonmammsize <- readRDS("./sizeEstDF.rds")
+rmtd <- mutate(rmtd, lnSize = lnMass/3, lnLifespan = log(longevity))
+rmtd$dat$lnSize[is.na(rmtd$dat$lnSize)] <- rmtd$dat$lnSVL[is.na(rmtd$dat$lnSize)]*lmsize$coef[2] + lmsize$coef[1]
+#splist1 <- gsub(" ", "_", nonmammsize$species)
+#splist2 <- gsub(" ", "_", rmtd$dat$species)
+##nonmammsize <- nonmammsize[-which(!splist1 %in% splist2),]
+#splist1 <- splist1[-which(!splist1 %in% splist2)]
+#index <- match(splist1, splist2)
+#rmtd$dat$lnSize[index] <- nonmammsize$size.thresh
+#rmtd$dat$lnLifespan[index] <- nonmammsize$lifespan.thresh
+#plot(rmtd$dat$lnLongevity, rmtd$dat$lnLifespan)
+plot(rmtd$dat$lnSVL, rmtd$dat$lnMass/3)
+abline(lmsize)
+#points(rmtd$dat$lnMass/3, rmtd$dat$lnSVL)
+```
+
+
+Some patches and some fits to get predictions
+```{r}
+#rmtd$dat$AdTerr[is.na(rmtd$dat$AdTerr) & rmtd$dat$order=="Squamata"] <- 1
+rmMtd <- filter(rmtd, !is.na(adMort), !is.na(IF), !is.na(lnSize), !is.na(juvMort))
+## Patches:
+rmMtd$dat$AdTerr[rmMtd$dat$species=="Typhlonectes_compressicauda"] <- 0
+rmMtd$dat$repmode[rmMtd$dat$species=="Uromastyx_acanthinura"] <- 0
+rmMtd$dat$repmode[rmMtd$dat$species=="Pogona_vitticeps"] <- 0
+
+
+table(rmMtd$dat$order)
+sum(table(rmMtd$dat$order))
+rownames(rmMtd$dat) <- rmMtd$phy$tip.label
+#glmfit <- phyloglm(repmode ~ scjMort*AdTerr + scadMort*AdTerr, data=rmMtd$dat, phy=rmMtd$phy, btol=20)
+#glmfitstep <- phyloglmstep(repmode ~ scjMort*AdTerr*scadMort*IF, data=rmMtd$dat, phy=rmMtd$phy, btol=20)
+#oglmfit <- glm(repmode ~ 1 + scjMort + scadMort + juvTerr + scjMort:juvTerr + scadMort:juvTerr, data=rmMtd$dat)
+glmfitalt2 <- glm(repmode ~ scadMort*AdTerr + IF + lnLongevity + scjMort*Terr, data=rmMtd$dat)
+glmfitalt3 <- glm(repmode ~Terr*scjMort + lnSize*scjMort + IF*scadMort,  data=rmMtd$dat)
+glmfitalt1 <- phyloglm(repmode ~  Terr*scjMort+ lnSize*scjMort +  IF*scadMort, data=rmMtd$dat, phy=rmMtd$phy, method="logistic_IG10", start.beta=glmfitalt3$coef)
+
+glmfitalt4 <- glm(repmode ~scjMort + scadMort + lnSize,  data=rmMtd$dat)
+glmfitalt5 <- phyloglm(repmode ~scjMort + scadMort + lnSize, data=rmMtd$dat, phy=rmMtd$phy, method="logistic_IG10", start.beta=glmfitalt4$coef)
+
+#glmfitalt4 <- glm(repmode ~scjMort*scadMort + lnSize*scjMort + scadMort*IF,  data=rmMtd$dat)
+#glmfitalt5 <- phyloglm(repmode ~  scjMort*scadMort+ lnSize*scjMort + scadMort*IF, data=rmMtd$dat, phy=rmMtd$phy, method="logistic_IG10", start.beta=glmfitalt4$coef)
+
+```
+
+```{r}
+#summary(glmfitstep)
+summary(glmfitalt1)
+summary(glmfitalt2)
+summary(glmfitalt3)
+summary(glmfitalt4)
+summary(glmfitalt5)
+
+```
+
+
+Choose one of the models and get predictions in the dataframe rmMtd that we can compare and plot
+```{r}
+model <- glmfitalt3
+rmMtd$dat$predicted  <- round(model$fitted.values,4)
+rmMtd$dat$residual  <- round(model$residuals,4)
+par(mar=c(10,5,1,1))
+boxplot(predicted ~ repmode + class, data=rmMtd$dat, las=2, xlab="", col=c("#f1c40f", "#e74c3c"))
+plot(rmMtd$dat$predicted, jitter(rmMtd$dat$repmode))
+```
+
+
+V. DOESN'T RUN - CAUSES CRASH. Trying to use phylopars.
+```{r}
+#rmTtd <- filter(rmtd, !is.na(AdTerr), order=="Sharks")
+rmtd$phy$edge.length[rmtd$phy$edge.length==0] <- 0.01
+rmtd$phy <- phytools::force.ultrametric(rmtd$phy)
+rmTtd <- filter(rmtd, order=="Sharks")
+pparsalt1 <- Rphylopars::phylopars.lm(repmode ~ scadMort, trait_data=rmtd$dat, tree=rmTtd$phy)
+summary(pparsalt1)
+```
+
+
+VI. Making contmaps for clade subsets
+```{r}
+sharktd <-filter(rmMtd, class %in% c("Sharks"))
+p1 <- phytools::contMap(sharktd$phy, sharktd[['repmode']], fsize=0.5)
+p2 <- phytools::contMap(sharktd$phy, sharktd[['predicted']], fsize=0.5)
+p3 <- phytools::contMap(sharktd$phy, abs(sharktd[['residual']]), fsize=0.5)
+p1 <- setMap(p1, c("#3498db", "#f1c40f", "#e74c3c"))
+p2 <- setMap(p2, c("#3498db", "#f1c40f", "#e74c3c"))
+p3 <- setMap(p3, c("#3498db", "#f1c40f", "#e74c3c"))
+#pdf("./sharkpredict.pdf", width=20, height=15)
+par(mfrow=c(1,3))
+plot(p1, ftype="off")
+plot(p2, ftype="off")
+plot(p3, ftype="off")
+#dev.off()
+```
+
+
+```{r}
+amphibtd <-filter(rmMtd, class %in% c("Amphibia","Reptilia"))
+p1 <- phytools::contMap(amphibtd$phy, amphibtd[['repmode']], fsize=0.5, )
+p2 <- phytools::contMap(amphibtd$phy, amphibtd[['predicted']], fsize=0.5)
+p3 <- phytools::contMap(amphibtd$phy, amphibtd[['residual']], fsize=0.5)
+p1 <- setMap(p1, c("#3498db", "#f1c40f", "#e74c3c"))
+p2 <- setMap(p2, c("#3498db", "#f1c40f", "#e74c3c"))
+p3 <- setMap(p3, c("#3498db", "#f1c40f", "#e74c3c"))
+#pdf("./amphibpredict.pdf", width=20, height=15)
+par(mfrow=c(1,3))
+plot(p1)
+plot(p2)
+plot(p3)
+#dev.off()
+```
+
+```{r}
+fishclass <- unique(rmMtd$dat$class[!rmMtd$dat$class %in% c("Sharks", "Mammalia", "Reptilia", "Aves", "Amphibia")])
+```
+
+
+VII. Making RGL 3d plots. Needs to have the predicted values from section IV.
+
+```{r}
+library(scatterplot3d)
+library(rgl)
+library(car)
+#View(arrange(amphibtd$dat, desc(predicted)))
+predscale <- floor((rmMtd$dat$predicted-min(rmMtd$dat$predicted))/diff(range(rmMtd$dat$predicted))*99)+1
+#scatter3d(x=rmMtd$dat$lnSize, y=rmMtd$dat$scadMort, z=rmMtd$dat$scjMort,  xlab="Size", ylab="Juv. Mortality", zlab="Adult Mortality",pch=21,point.col=colorRampPalette(c("#3498db", "#2ecc71", "#f1c40f", "#e74c3c"))(100)[predscale], surface=FALSE, sphere.size=predscale^(1/3))
+.rmMtd <- rmMtd
+predscale <- floor((.rmMtd$dat$predicted-min(rmMtd$dat$predicted))/diff(range(rmMtd$dat$predicted))*99)+1
+spherecol <- colorRampPalette(c("#3498db", "#e74c3c"))(2)[.rmMtd$dat$repmode+1]
+terrcol <-  colorRampPalette(c("#2980b9", "#e67e22"))(2)[.rmMtd$dat$Terr+1]
+pmsDat <- cbind(BS=.rmMtd$dat$logMass3, AM=.rmMtd$dat$scadMort, OM=.rmMtd$dat$scjMort)
+rownames(pmsDat) <- .rmMtd$phy$tip.label
+
+scatter3d(x=.rmMtd$dat$scadMort, y=.rmMtd$dat$scjMort, z=.rmMtd$dat$lnSize,  xlab="Adult Mortality", ylab="Juv. Mortality", zlab="Size", point.alpha=10, fogtype="none",point.col=terrcol, surface=FALSE, sphere.size=(predscale/3)^(1/3))
+#Identify3d(x=.rmMtd$dat$scadMort, y=.rmMtd$dat$scjMort, z=.rmMtd$dat$lnSize,labels=.rmMtd$dat$species, offset=0.05)
+
+```
+
+Mammals
+
+```{r}
+.rmMtd <- mutate(rmMtd, plotcode = 1 + 2*(class %in% c("Mammalia")) + repmode )
+predscale <- floor((.rmMtd$dat$predicted-min(rmMtd$dat$predicted))/diff(range(rmMtd$dat$predicted))*99)+1
+spherecol <- c("#ecf0f1", "#bdc3c7", "#3498db", "#e74c3c")[.rmMtd$dat$plotcode]
+#pmsDat <- cbind(BS=.rmMtd$dat$lnSize, AM=.rmMtd$dat$scadMort, OM=.rmMtd$dat$scjMort)
+#rownames(pmsDat) <- .rmMtd$phy$tip.label
+
+
+scatter3d(x=.rmMtd$dat$scadMort, y=.rmMtd$dat$scjMort, z=.rmMtd$dat$logMass3,  xlab="Adult Mortality", ylab="Juv. Mortality", zlab="Size", point.alpha=10, fogtype="none",point.col=spherecol, surface=FALSE, sphere.size=(predscale/3)^(1/3))
+#Identify3d(x=.rmMtd$dat$scadMort, y=.rmMtd$dat$scjMort, z=.rmMtd$dat$lnSize,labels=.rmMtd$dat$species, offset=0.05)
+
+```
+
+
+Birds
+
+```{r}
+.rmMtd <- mutate(rmMtd, plotcode = 1 + 2*(class %in% c("Aves")) + repmode )
+predscale <- floor((.rmMtd$dat$predicted-min(rmMtd$dat$predicted))/diff(range(rmMtd$dat$predicted))*99)+1
+spherecol <- c("#ecf0f1", "#bdc3c7", "#3498db", "#e74c3c")[.rmMtd$dat$plotcode]
+#pmsDat <- cbind(BS=.rmMtd$dat$lnSize, AM=.rmMtd$dat$scadMort, OM=.rmMtd$dat$scjMort)
+#rownames(pmsDat) <- .rmMtd$phy$tip.label
+
+
+scatter3d(x=.rmMtd$dat$scadMort, y=.rmMtd$dat$scjMort, z=.rmMtd$dat$lnSize,  xlab="Adult Mortality", ylab="Juv. Mortality", zlab="Size", point.alpha=10, fogtype="none",point.col=spherecol, surface=FALSE, sphere.size=(predscale/3)^(1/3))
+#Identify3d(x=.rmMtd$dat$scadMort, y=.rmMtd$dat$scjMort, z=.rmMtd$dat$lnSize,labels=.rmMtd$dat$species, offset=0.05)
+
+```
+
+
+
+Amphibians
+
+```{r}
+.rmMtd <- mutate(rmMtd, plotcode = 1 + 2*(class %in% c("Amphibia", "Reptilia", "Actinopterygii")) + repmode )
+predscale <- floor((.rmMtd$dat$predicted-min(rmMtd$dat$predicted))/diff(range(rmMtd$dat$predicted))*99)+1
+spherecol <- c("#ecf0f1", "#bdc3c7", "#3498db", "#e74c3c")[.rmMtd$dat$plotcode]
+#pmsDat <- cbind(BS=.rmMtd$dat$lnSize, AM=.rmMtd$dat$scadMort, OM=.rmMtd$dat$scjMort)
+#rownames(pmsDat) <- .rmMtd$phy$tip.label
+
+scatter3d(x=.rmMtd$dat$scadMort, y=.rmMtd$dat$scjMort, z=.rmMtd$dat$lnSize,  xlab="Adult Mortality", ylab="Juv. Mortality", zlab="Size", point.alpha=10, fogtype="none",point.col=spherecol, surface=FALSE, sphere.size=(predscale/3)^(1/3))
+#Identify3d(x=.rmMtd$dat$scadMort, y=.rmMtd$dat$scjMort, z=.rmMtd$dat$lnSize,labels=.rmMtd$dat$species, offset=0.05)
+
+```
+
+Squamates
+
+```{r}
+.rmMtd <- mutate(rmMtd, plotcode = 1 + 2*(class %in% c("Reptilia")) + repmode )
+predscale <- floor((.rmMtd$dat$predicted-min(rmMtd$dat$predicted))/diff(range(rmMtd$dat$predicted))*99)+1
+spherecol <- c("#ecf0f1", "#bdc3c7", "#3498db", "#e74c3c")[.rmMtd$dat$plotcode]
+#pmsDat <- cbind(BS=.rmMtd$dat$lnSize, AM=.rmMtd$dat$scadMort, OM=.rmMtd$dat$scjMort)
+#rownames(pmsDat) <- .rmMtd$phy$tip.label
+
+
+scatter3d(x=.rmMtd$dat$scadMort, y=.rmMtd$dat$scjMort, z=.rmMtd$dat$lnSize,  xlab="Adult Mortality", ylab="Juv. Mortality", zlab="Size", point.alpha=10, fogtype="none",point.col=spherecol, surface=FALSE, sphere.size=(predscale/3)^(1/3))
+#Identify3d(x=.rmMtd$dat$scadMort, y=.rmMtd$dat$scjMort, z=.rmMtd$dat$lnSize,labels=.rmMtd$dat$species, offset=0.05)
+
+```
+
+Sharks
+
+```{r}
+.rmMtd <- mutate(rmMtd, plotcode = 1 + 2*(class %in% c("Sharks", "Mammalia", "Aves")) + repmode )
+predscale <- floor((.rmMtd$dat$predicted-min(rmMtd$dat$predicted))/diff(range(rmMtd$dat$predicted))*99)+1
+spherecol <- c("#ecf0f1", "#bdc3c7", "#3498db", "#e74c3c")[.rmMtd$dat$plotcode]
+#pmsDat <- cbind(BS=.rmMtd$dat$lnSize, AM=.rmMtd$dat$scadMort, OM=.rmMtd$dat$scjMort)
+#rownames(pmsDat) <- .rmMtd$phy$tip.label
+
+
+scatter3d(x=.rmMtd$dat$scadMort, y=.rmMtd$dat$scjMort, z=.rmMtd$dat$lnSize,  xlab="Adult Mortality", ylab="Juv. Mortality", zlab="Size", point.alpha=10, fogtype="none",point.col=spherecol, surface=FALSE, sphere.size=(predscale/3)^(1/3))
+#Identify3d(x=.rmMtd$dat$scadMort, y=.rmMtd$dat$scjMort, z=.rmMtd$dat$lnSize,labels=.rmMtd$dat$species, offset=0.05)
+```
+
+Bony Fish
+
+```{r}
+.rmMtd <- mutate(rmMtd, plotcode = 1 + 2*(!class %in% c("Sharks", "Aves", "Amphibia", "Reptilia", "Mammalia")) + repmode )
+predscale <- floor((.rmMtd$dat$predicted-min(rmMtd$dat$predicted))/diff(range(rmMtd$dat$predicted))*99)+1
+spherecol <- c("#ecf0f1", "#bdc3c7", "#3498db", "#e74c3c")[.rmMtd$dat$plotcode]
+#pmsDat <- cbind(BS=.rmMtd$dat$lnSize, AM=.rmMtd$dat$scadMort, OM=.rmMtd$dat$scjMort)
+#rownames(pmsDat) <- .rmMtd$phy$tip.label
+
+
+scatter3d(x=.rmMtd$dat$scadMort, y=.rmMtd$dat$scjMort, z=.rmMtd$dat$lnSize,  xlab="Adult Mortality", ylab="Juv. Mortality", zlab="Size", point.alpha=10, fogtype="none",point.col=spherecol, surface=FALSE, sphere.size=(predscale/3)^(1/3))
+#Identify3d(x=.rmMtd$dat$scadMort, y=.rmMtd$dat$scjMort, z=.rmMtd$dat$lnSize,labels=.rmMtd$dat$species, offset=0.05)
+```
+
+
+```{r}
+.rmMtd <- filter(rmMtd, class %in% c("Amphibia", "Reptilia", ) | family %in% c("Balaenopteridae", "Soricidae", "Cricetidae"))
+predscale <- floor((.rmMtd$dat$predicted-min(rmMtd$dat$predicted))/diff(range(rmMtd$dat$predicted))*99)+1
+spherecol <- colorRampPalette(c("#3498db", "#e74c3c"))(2)[.rmMtd$dat$repmode+1]
+pmsDat <- cbind(BS=.rmMtd$dat$lnSize, AM=.rmMtd$dat$scadMort, OM=.rmMtd$dat$scjMort)
+rownames(pmsDat) <- .rmMtd$phy$tip.label
+#phylomorphospace3d(.rmMtd$phy, X=pmsDat, control=list(spin=FALSE, ftype="off", method="dynamic",point.col=spherecol, sphere.size=(predscale)^1/3))
+
+
+scatter3d(x=.rmMtd$dat$scadMort, y=.rmMtd$dat$scjMort, z=.rmMtd$dat$lnSize,  xlab="Adult Mortality", ylab="Juv. Mortality", zlab="Size", point.alpha=10, fogtype="none",point.col=spherecol, surface=FALSE, sphere.size=(predscale/3)^(1/3))
+#Identify3d(x=.rmMtd$dat$scadMort, y=.rmMtd$dat$scjMort, z=.rmMtd$dat$lnSize,labels=.rmMtd$dat$species, offset=0.05)
+
+#scatterplot3d(x=rmMtd$dat$lnSize, y=rmMtd$dat$scadMort, z=rmMtd$dat$scjMort, xlab="Size", ylab="Juv. Mortality", zlab="Adult Mortality",pch=21, bg=colorRampPalette(c("#3498db", "#2ecc71", "#f1c40f", "#e74c3c"))(100)[predscale])
+```
+
+```{r}
+.rmMtd <- filter(rmMtd, !class %in% c("Amphibia", "Reptilia", "Aves", "Mammalia") | family %in% c("Balaenopteridae", "Soricidae", "Cricetidae") | species %in% c("Mantella laevigata"))
+predscale <- floor((.rmMtd$dat$predicted-min(rmMtd$dat$predicted))/diff(range(rmMtd$dat$predicted))*99)+1
+spherecol <- colorRampPalette(c("#3498db", "#e74c3c"))(2)[.rmMtd$dat$repmode+1]
+pmsDat <- cbind(BS=.rmMtd$dat$lnSize, AM=.rmMtd$dat$scadMort, OM=.rmMtd$dat$scjMort)
+rownames(pmsDat) <- .rmMtd$phy$tip.label
+#phylomorphospace3d(.rmMtd$phy, X=pmsDat, control=list(spin=FALSE, ftype="off", method="dynamic",point.col=spherecol, sphere.size=(predscale)^1/3))
+
+
+scatter3d(x=.rmMtd$dat$scadMort, y=.rmMtd$dat$scjMort, z=.rmMtd$dat$lnSize,  xlab="Adult Mortality", ylab="Juv. Mortality", zlab="Size", point.alpha=10, fogtype="none",point.col=spherecol, surface=FALSE, sphere.size=(predscale/3)^(1/3))
+#Identify3d(x=.rmMtd$dat$scadMort, y=.rmMtd$dat$scjMort, z=.rmMtd$dat$lnSize,labels=.rmMtd$dat$species, offset=0.05)
+
+```
+
+#Ternary plots
+```{r}
+library(Ternary)
+
+terntd <- td %>% filter(!is.na(juvMort), !is.na(adMort), !is.na(lnSize), !is.na(repmode)) %>% mutate(scSize = scale(lnSize), scadMort=scale(adMort), scjMort=scale(juvMort)) %>% mutate(scSize=scSize-min(scSize, na.rm=TRUE), scadMort=scadMort-min(scadMort, na.rm=TRUE), scjMort=scjMort-min(scjMort, na.rm=TRUE)) %>% mutate(trAdMort = scadMort/(scadMort+scjMort+scSize), trJMort = scjMort/(scadMort+scjMort+scSize), trSize = scSize/(scadMort+scjMort+scSize))
+terntd$dat$species <- terntd$phy$tip.label
+terntd <-filter(terntd, !is.na(trJMort), !is.na(trAdMort), !is.na(trSize)) %>% select(order, class, family,species, trAdMort, trJMort, trSize, repmode, AdTerr, Terr)
+Ternary::TernaryPlot(alab="Adult Mortality", blab="Juv Mortality", clab="Body Size", main="Class")
+TernaryPoints(terntd$dat[,5:7], pch=21, cex=0.35, bg=terntd$dat$class, col=terntd$dat$class)
+
+Ternary::TernaryPlot(alab="Adult Mortality", blab="Juv Mortality", clab="Body Size", main="Reproductive Mode")
+TernaryPoints(terntd$dat[,5:7], pch=21, cex=0.35, bg=terntd$dat$repmode+1, col=terntd$dat$repmode+1)
+
+Ternary::TernaryPlot(alab="Adult Mortality", blab="Juv Mortality", clab="Body Size", main="Adult Terrestrial")
+TernaryPoints(terntd$dat[,5:7], pch=21, cex=0.35, bg=terntd$dat$AdTerr+1, col=terntd$dat$AdTerr+1)
+
+Ternary::TernaryPlot(alab="Adult Mortality", blab="Juv Mortality", clab="Body Size", main="Juv Terrestrial")
+TernaryPoints(terntd$dat[,5:7], pch=21, cex=0.35, bg=terntd$dat$Terr+1, col=terntd$dat$Terr+1)
+
+Ternary::TernaryPlot(alab="Adult Mortality", blab="Juv Mortality", clab="Body Size", main="Sharks")
+.terntd <- filter(terntd, order=="Sharks")
+TernaryPoints(.terntd$dat[,5:7], pch=21, cex=0.35, bg=.terntd$dat$repmode+1, col=.terntd$dat$repmode+1)
+
+Ternary::TernaryPlot(alab="Adult Mortality", blab="Juv Mortality", clab="Body Size", main="Reptilia")
+.terntd <- filter(terntd, class=="Reptilia")
+TernaryPoints(.terntd$dat[,5:7], pch=21, cex=0.35, bg=.terntd$dat$repmode+1, col=.terntd$dat$repmode+1)
+
+Ternary::TernaryPlot(alab="Adult Mortality", blab="Juv Mortality", clab="Body Size", main="Aves")
+.terntd <- filter(terntd, class=="Aves")
+TernaryPoints(.terntd$dat[,5:7], pch=21, cex=0.35, bg=.terntd$dat$repmode+1, col=.terntd$dat$repmode+1)
+
+Ternary::TernaryPlot(alab="Adult Mortality", blab="Juv Mortality", clab="Body Size", main="Amphibia")
+.terntd <- filter(terntd, class=="Amphibia")
+TernaryPoints(.terntd$dat[,5:7], pch=21, cex=0.35, bg=.terntd$dat$repmode+1, col=.terntd$dat$repmode+1)
+
+Ternary::TernaryPlot(alab="Adult Mortality", blab="Juv Mortality", clab="Body Size", main="Actinopterygii")
+.terntd <- filter(terntd, class=="Actinopterygii")
+TernaryPoints(.terntd$dat[,5:7], pch=21, cex=0.35, bg=.terntd$dat$repmode+1, col=.terntd$dat$repmode+1)
+
+Ternary::TernaryPlot(alab="Adult Mortality", blab="Juv Mortality", clab="Body Size", main="Mammalia")
+.terntd <- filter(terntd, class=="Mammalia")
+TernaryPoints(.terntd$dat[,5:7], pch=21, cex=0.35, bg=.terntd$dat$repmode+1, col=.terntd$dat$repmode+1)
+
+
+Ternary::TernaryPlot(alab="Adult Mortality", blab="Juv Mortality", clab="Body Size", main="Not mammals or birds")
+.terntd <- filter(terntd, !class %in% c("Mammalia", "Aves"))
+TernaryPoints(.terntd$dat[,5:7], pch=21, cex=0.35, bg=.terntd$dat$repmode+1, col=.terntd$dat$repmode+1)
+
+
+#plot(terntd$dat$trAdMort, terntd$dat$trJMort)
+
+
+```
+
+## Now fit to discrete ternary plot data
+```{r}
+library(Ternary)
+library(MCMCpack)
+library(combinat)
+library(dplyr)
+
+dat <- dplyr::select(terntd$dat, 5,6,7)
+
+bins <- 3
+
+combos <- combinat::combn(rep(1:bins,3), 3) ## Create all combinations of values 1:bins
+sums <- apply(combos, 2, sum) #Sum the 3 values for the 3 traits
+combos <- combos[,sums %in% c(bins+2, bins+1)] #Only retain those that sum to bins+2 and bins+1 (fit in the triangle)
+cells <- t(combos[,!duplicated(apply(combos, 2,paste, collapse=""))]) #remove duplicated bin combinations
+colnames(cells) <- c("A", "B", "C") #label traits
+cells <- cells[order(cells[,3],(bins+1)-cells[,1],(bins+1)-cells[,2], decreasing=TRUE),] #reorder the cells to be prettier
+cellnames <- apply(cells, 1, paste, collapse="") #Give the cells a state label  
+ddat <- apply(dat, 2, cut,breaks=seq(0,1, length.out=bins+1), labels=1:bins) #Find where the data falls in the state space
+ddat <- match(apply(ddat, 1, paste, collapse=""), cellnames) #match the data's state to the state label
+terntd <- mutate(terntd, ddat=ddat) 
+
+
+Ternary::TernaryPlot(alab="A", blab="B", clab="C", grid.lines = 3) #Plot with points labeled by their numeric state value (values with more than two digits won't show up right)
+ssq <- seq(0, 1, length.out=bins+4)[c(2,4,6)]
+midcells <- cbind(ssq[cells[,1]], ssq[cells[,2]], ssq[cells[,3]])
+for(i in 1:nrow(midcells)){
+  midcells[i,] <- midcells[i,]/sum(midcells[i,])
+}
+colnames(midcells) <- colnames(cells)
+TernaryPoints(midcells, pch=as.character(1:9))
+#TernaryPoints(dat, pch=as.character(ddat)) 
+
+Q <- as.matrix(dist(cells))
+Q[Q!=1] <- 0
+Q
+```
+
+```{r}
+library(castor)
+.terntd <- filter(terntd, !is.na(ddat))
+ERfit <- castor::fit_mk(.terntd$phy, 9, tip_states=.terntd[['ddat']], rate_model=Q)
+ERfit
+
+
+```
+
+```{r}
+## Viviparity
+.terntd <- mutate(.terntd, ddatpm = ddat+repmode*9) %>% filter(!class %in% c("Mammalia", "Aves"))
+DM1 <- DM2 <- diag(9)
+diag(DM1) <- 2
+diag(DM2) <- 3
+
+Qpm0.ER <- rbind(cbind(Q, DM1), cbind(DM1, Q))
+Qpm0.Asym <- rbind(cbind(Q, DM1), cbind(DM2, Q))
+rownames(Qpm0.ER) <- colnames(Qpm0.ER) <- 1:18
+rownames(Qpm0.Asym) <- colnames(Qpm0.Asym) <- 1:18
+Fit.pm0.ER <- castor::fit_mk(.terntd$phy, 18, tip_states=.terntd[['ddatpm']], rate_model=Qpm0.ER)
+Fit.pm0.Asym <- castor::fit_mk(.terntd$phy, 18, tip_states=.terntd[['ddatpm']], rate_model=Qpm0.Asym)
+Fit.pm0.ER
+Fit.pm0.Asym
+
+```
+
+
+```{r}
+Qpm1235.ER <- Qpm0.ER
+Qpm1235.Asym <- Qpm0.Asym
+
+pmRates <- cbind(c(1,2,3,5), c(1,2,3,5)+nrow(Q))
+for(i in 1:nrow(pmRates)){
+  Qpm1235.ER[pmRates[i,1], pmRates[i,2]]<- Qpm1235.ER[pmRates[i,2], pmRates[i,1]] <- max(Qpm0.ER)+1
+}
+
+pmRates <- cbind(c(1,2,3,5), c(1,2,3,5)+nrow(Q))
+for(i in 1:nrow(pmRates)){
+  Qpm1235.Asym[pmRates[i,1], pmRates[i,2]]<- max(Qpm0.Asym)+1
+  Qpm1235.Asym[pmRates[i,2], pmRates[i,1]]<- max(Qpm0.Asym)+2
+}
+
+
+
+Qpm1235.ER
+Qpm1235.Asym
+
+Fit.pm1235.ER <- castor::fit_mk(.terntd$phy, 18, tip_states=.terntd[['ddatpm']], rate_model=Qpm1235.ER)
+Fit.pm1235.Asym <- castor::fit_mk(.terntd$phy, 18, tip_states=.terntd[['ddatpm']], rate_model=Qpm1235.Asym)
+Fit.pm1235.ER$loglikelihood
+Fit.pm1235.Asym$loglikelihood
+
+```
+
+```{r}
+DM3 <- DM4 <- diag(9)
+diag(DM3) <- 1:9
+diag(DM4) <- 10:18
+Qpm.ARD <- rbind(cbind(Q, DM3), cbind(DM4,Q))
+colnames(Qpm.ARD) <- rownames(Qpm.ARD) <- 1:18
+Fit.pm.ARD <- castor::fit_mk(.terntd$phy, 18, tip_states=.terntd[['ddatpm']], rate_model=Qpm.ARD)
+
+```
+
+
+
+```{r}
+cat("\nAIC ER no parity equal across regions\n")
+2* max(Qpm0.ER) - 2*Fit.pm0.ER$loglikelihood
+cat("\nAIC Asym no parity equal across regions\n")
+2* max(Qpm0.Asym) - 2*Fit.pm0.Asym$loglikelihood
+cat("\nAIC ER viviparous increased in 1235\n")
+2* max(Qpm1235.ER) - 2*Fit.pm1235.ER$loglikelihood
+cat("\nAIC Asym viviparous increased in 1235\n")
+2* max(Qpm1235.Asym) - 2*Fit.pm1235.Asym$loglikelihood
+
+```
+
+```{r}
+
+Ternary::TernaryPlot(alab="Adult Mortality", blab="Juv Mortality", clab="Body Size", main="Not mammals or birds", grid.lines = 3)
+.terntd <- filter(terntd, !class %in% c("Mammalia", "Aves"))
+TernaryPoints(.terntd$dat[,5:7], pch=21, cex=0.35, bg=.terntd$dat$repmode+1, col=.terntd$dat$repmode+1)
+TernaryPoints(midcells, pch=as.character(1:9), col="red", cex=1.25)
+```
+
+
+#VIII. New hyp. framework: 
+
+```{r}
+library(phylolm)
+rmtd <- filter(td, !is.na(repmode))#removing NAs
+table(rmtd$dat$order)
+rmtd <- mutate(rmtd, scjMort = scale(juvMort)[,1], scadMort = scale(adMort)[,1], lnLongevity=log(longevity), lnMass=log(mass), lnSVL =log(svl), lnSize=logMass3)
+rmtd$dat$AdTerr[is.na(rmtd$dat$AdTerr) & rmtd$dat$order=="Squamata"] <- 1
+
+
+```
+
+
+```{r}
+rmtd$dat$AdTerr[is.na(rmtd$dat$AdTerr) & rmtd$dat$order=="Squamata"] <- 1
+rmMtd <- filter(rmtd, !is.na(adMort), !is.na(IF), !is.na(lnSize), !is.na(juvMort))
+## Patches:
+rmMtd$dat$AdTerr[rmMtd$dat$species=="Typhlonectes compressicauda"] <- 0
+rmMtd$dat$repmode[rmMtd$dat$species=="Uromastyx acanthinura"] <- 0
+rmMtd$dat$repmode[rmMtd$dat$species=="Pogona vitticeps"] <- 0
+
+
+table(rmMtd$dat$order)
+sum(table(rmMtd$dat$order))
+rownames(rmMtd$dat) <- rmMtd$phy$tip.label
+#glmfit <- phyloglm(repmode ~ scjMort*AdTerr + scadMort*AdTerr, data=rmMtd$dat, phy=rmMtd$phy, btol=20)
+#glmfitstep <- phyloglmstep(repmode ~ scjMort*AdTerr*scadMort*IF, data=rmMtd$dat, phy=rmMtd$phy, btol=20)
+#oglmfit <- glm(repmode ~ 1 + scjMort + scadMort + juvTerr + scjMort:juvTerr + scadMort:juvTerr, data=rmMtd$dat)
+fitsjMort <- list()
+fitsjMort[[1]] <- phylolm(scjMort ~ lnSize*Terr+ repmode+Terr, data=rmMtd$dat, phy=rmMtd$phy, model="lambda")
+fitsjMort[[2]] <- phylolm(scjMort ~ lnSize+ lnLongevity+ repmode + Terr, data=rmMtd$dat, phy=rmMtd$phy, model="lambda")
+fitsjMort[[3]] <- phylolm(scjMort ~ scadMort, data=rmMtd$dat, phy=rmMtd$phy, model="lambda")
+fitsjMort[[4]] <- phylolm(scjMort ~ IF, data=rmMtd$dat, phy=rmMtd$phy, model="lambda")
+fitsjMort[[5]] <- phylolm(scjMort ~ Terr, data=rmMtd$dat, phy=rmMtd$phy, model="lambda")
+fitsjMort[[6]] <- phylolm(scjMort ~ lnSize, data=rmMtd$dat, phy=rmMtd$phy, model="lambda")
+fitsjMort[[7]] <- phylolm(scjMort ~ lnSize*scadMort, data=rmMtd$dat, phy=rmMtd$phy, model="lambda")
+
+```
+
+
+```{r}
+lapply(fitsjMort, summary)
+```
+
+
+```{r}
+rmtd$dat$AdTerr[is.na(rmtd$dat$AdTerr) & rmtd$dat$order=="Squamata"] <- 1
+rmMtd <- filter(rmtd, !is.na(adMort), !is.na(IF), !is.na(lnSize), !is.na(juvMort))
+## Patches:
+rmMtd$dat$AdTerr[rmMtd$dat$species=="Typhlonectes compressicauda"] <- 0
+rmMtd$dat$repmode[rmMtd$dat$species=="Uromastyx acanthinura"] <- 0
+rmMtd$dat$repmode[rmMtd$dat$species=="Pogona vitticeps"] <- 0
+
+
+table(rmMtd$dat$order)
+sum(table(rmMtd$dat$order))
+rownames(rmMtd$dat) <- rmMtd$phy$tip.label
+#glmfit <- phyloglm(repmode ~ scjMort*AdTerr + scadMort*AdTerr, data=rmMtd$dat, phy=rmMtd$phy, btol=20)
+#glmfitstep <- phyloglmstep(repmode ~ scjMort*AdTerr*scadMort*IF, data=rmMtd$dat, phy=rmMtd$phy, btol=20)
+#oglmfit <- glm(repmode ~ 1 + scjMort + scadMort + juvTerr + scjMort:juvTerr + scadMort:juvTerr, data=rmMtd$dat)
+fitsadMort <- list()
+fitsadMort[[1]] <- phylolm(scadMort ~ lnSize*Terr+ repmode+Terr, data=rmMtd$dat, phy=rmMtd$phy, model="lambda")
+fitsadMort[[2]] <- phylolm(scadMort ~ lnSize+ lnLongevity+ repmode + Terr, data=rmMtd$dat, phy=rmMtd$phy, model="lambda")
+fitsadMort[[3]] <- phylolm(scadMort ~ scjMort, data=rmMtd$dat, phy=rmMtd$phy, model="lambda")
+fitsadMort[[4]] <- phylolm(scadMort ~ IF, data=rmMtd$dat, phy=rmMtd$phy, model="lambda")
+fitsadMort[[5]] <- phylolm(scadMort ~ Terr, data=rmMtd$dat, phy=rmMtd$phy, model="lambda")
+fitsadMort[[6]] <- phylolm(scadMort ~ lnSize, data=rmMtd$dat, phy=rmMtd$phy, model="lambda")
+fitsadMort[[7]] <- phylolm(scadMort ~ lnSize*scjMort, data=rmMtd$dat, phy=rmMtd$phy, model="lambda")
+```
+
+```{r}
+lapply(fitsadMort, summary)
+```
+
