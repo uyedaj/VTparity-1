@@ -856,9 +856,13 @@ Fit.pm1235.Asym$loglikelihood
 ```
 
 ```{r}
+.terntd <- filter(terntd, !is.na(ddat))
+.terntd <- mutate(.terntd, ddatpm = ddat+repmode*9) %>% filter(!class %in% c("Mammalia", "Aves"))
+
 DM3 <- DM4 <- diag(9)
-diag(DM3) <- 1:9
-diag(DM4) <- 10:18
+diag(DM3) <- 1+1:9
+DM3[9,9] <- 0
+diag(DM4) <- 0
 Qpm.ARD <- rbind(cbind(Q, DM3), cbind(DM4,Q))
 colnames(Qpm.ARD) <- rownames(Qpm.ARD) <- 1:18
 Fit.pm.ARD <- castor::fit_mk(.terntd$phy, 18, tip_states=.terntd[['ddatpm']], rate_model=Qpm.ARD)
@@ -876,15 +880,43 @@ cat("\nAIC ER viviparous increased in 1235\n")
 2* max(Qpm1235.ER) - 2*Fit.pm1235.ER$loglikelihood
 cat("\nAIC Asym viviparous increased in 1235\n")
 2* max(Qpm1235.Asym) - 2*Fit.pm1235.Asym$loglikelihood
-
+cat("\nAIC Asym viviparous ARD\n")
+2*max(Qpm.ARD) - 2*Fit.pm.ARD$loglikelihood
 ```
 
 ```{r}
+gains <- diag(Fit.pm.ARD$transition_matrix[1:9,10:18])
+losses <- diag(Fit.pm.ARD$transition_matrix[10:18,1:9])
+plot(c(1,9), c(0,0.01), type="n")
+lines(1:9, gains, col="blue")
+lines(1:9, losses, col="red")
+```
+
+
+```{r}
+relrate <- log(gains-losses+0.0001)
+relratescaled <- floor((relrate - min(relrate))/(max(relrate) - min(relrate)) * 99+1)
+
+Point2Area <- function(a, b, c){
+  .ddat <- apply(cbind(a,b,c), 2, cut, breaks=seq(0,1, length.out=bins+1), labels=1:bins) #Find where the data falls in the state space
+  match(paste(.ddat, collapse=""), cellnames) 
+}
+Point2Area(1/3+0.01, 1/3-0.01, 1/3)
+values <- rdirichlet(10000, c(1,1,1))
+region <- NULL
+for(i in 1:nrow(values)){
+  region[i] <- Point2Area(values[i,1], values[i, 2], values[i,3])
+}
+
+hc <- viridis::viridis(100, 0.2)
+ratecol <- setNames(hc[relratescaled], 1:9)
+
 
 Ternary::TernaryPlot(alab="Adult Mortality", blab="Juv Mortality", clab="Body Size", main="Not mammals or birds", grid.lines = 3)
-.terntd <- filter(terntd, !class %in% c("Mammalia", "Aves"))
-TernaryPoints(.terntd$dat[,5:7], pch=21, cex=0.35, bg=.terntd$dat$repmode+1, col=.terntd$dat$repmode+1)
-TernaryPoints(midcells, pch=as.character(1:9), col="red", cex=1.25)
+.plotterntd <- filter(terntd, !class %in% c("Mammalia", "Aves"))
+TernaryPoints(values, col=ratecol[region], bg=ratecol[region], pch=24)
+TernaryPoints(.plotterntd$dat[,5:7], pch=21, cex=0.35, bg=.terntd$dat$repmode+1, col=.terntd$dat$repmode+1)
+
 ```
 
 
